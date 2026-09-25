@@ -49,6 +49,7 @@ model User {
   finances      Finance[]
   fines         Fine[]    @relation("FinedUser")
   issuedFines   Fine[]    @relation("FineIssuer")
+  expenses      Expense[]
 }
 
 model VerificationToken {
@@ -93,4 +94,15 @@ model Fine {
   
   user      User     @relation("FinedUser", fields: [userId], references: [id], onDelete: Cascade)
   issuer    User     @relation("FineIssuer", fields: [issuedBy], references: [id], onDelete: Cascade)
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // "GREEN" or "RED"
+  amount      Float
+  description String
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

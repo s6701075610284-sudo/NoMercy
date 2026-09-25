@@ -48,9 +48,10 @@ export async function getFinances() {
 }
 
 export async function getFinanceStats() {
-  const finances = await prisma.finance.findMany({
-    where: { status: "APPROVED" }
-  });
+  const [finances, expenses] = await Promise.all([
+    prisma.finance.findMany({ where: { status: "APPROVED" } }),
+    prisma.expense.findMany()
+  ]);
   
   let totalGreen = 0;
   let totalRed = 0;
@@ -58,6 +59,11 @@ export async function getFinanceStats() {
   finances.forEach(f => {
     if (f.type === "GREEN") totalGreen += f.amount;
     if (f.type === "RED") totalRed += f.amount;
+  });
+
+  expenses.forEach(e => {
+    if (e.type === "GREEN") totalGreen -= e.amount;
+    if (e.type === "RED") totalRed -= e.amount;
   });
 
   return { totalGreen, totalRed };
@@ -99,4 +105,47 @@ export async function rejectFinance(id: string) {
 
   revalidatePath("/");
   return { success: true };
+}
+
+export async function addExpense(data: { type: string; amount: number; description: string }) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) throw new Error("Unauthorized");
+  
+  // @ts-ignore
+  const role = session.user.role;
+  if (role !== "Moderator" && role !== "Boss" && role !== "Underboss" && role !== "Treasurer") {
+    throw new Error("ไม่มีสิทธิ์บันทึกรายจ่าย");
+  }
+
+  if (!data.amount || data.amount <= 0 || !data.description) {
+    throw new Error("ข้อมูลไม่ครบถ้วน");
+  }
+
+  // @ts-ignore
+  const userId = session.user.id;
+
+  await prisma.expense.create({
+    data: {
+      userId,
+      type: data.type,
+      amount: data.amount,
+      description: data.description
+    }
+  });
+
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function getExpenses() {
+  const expenses = await prisma.expense.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: {
+      user: {
+        select: { name: true, image: true }
+      }
+    }
+  });
+  
+  return expenses;
 }
