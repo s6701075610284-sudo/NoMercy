@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getMembers, updateMemberRole, promoteToBoss } from "@/app/actions/members";
+import { getMembers, updateMemberRole } from "@/app/actions/members";
 import { User } from "@prisma/client";
 import { Shield, ShieldAlert, Crown, User as UserIcon } from "lucide-react";
 
@@ -35,13 +35,7 @@ export function MembersContent({ currentUserRole }: { currentUserRole: string })
     }
   };
 
-  const handleSelfPromote = async () => {
-    const res = await promoteToBoss();
-    if (res.success) {
-      alert("ยินดีด้วย! คุณได้รับการแต่งตั้งเป็น Boss แล้ว (รีเฟรชหน้าเว็บเพื่อดูผล)");
-      window.location.reload();
-    }
-  };
+
 
   if (loading) {
     return <div className="p-8 text-center text-brand-400">กำลังโหลดข้อมูลสมาชิก...</div>;
@@ -54,15 +48,6 @@ export function MembersContent({ currentUserRole }: { currentUserRole: string })
           <h2 className="text-2xl font-bold text-white tracking-wide">จัดการสมาชิก</h2>
           <p className="text-sm text-brand-400">รายชื่อสมาชิกทั้งหมดภายในแก๊ง</p>
         </div>
-        
-        {currentUserRole !== "Boss" && (
-          <button 
-            onClick={handleSelfPromote}
-            className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg text-white font-bold text-sm hover:scale-105 transition-all shadow-lg shadow-yellow-500/20"
-          >
-            ตั้งตัวเองเป็น Boss (โหมดทดสอบ)
-          </button>
-        )}
       </div>
 
       <div className="glass-card rounded-2xl overflow-hidden">

@@ -39,19 +39,3 @@ export async function updateMemberRole(userId: string, newRole: string) {
   revalidatePath("/");
 }
 
-export async function promoteToBoss() {
-  // HIDDEN COMMAND: Allow the first person (or any person calling this) to become Boss 
-  // so the user can test the admin features.
-  const session = await getServerSession(authOptions);
-  if (!session) return { success: false };
-
-  // @ts-ignore
-  await prisma.user.update({
-    // @ts-ignore
-    where: { id: session.user.id },
-    data: { role: "Boss" }
-  });
-  
-  revalidatePath("/");
-  return { success: true };
-}
