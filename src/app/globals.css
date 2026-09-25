@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Prompt', 'Inter', sans-serif;
+  
+  --color-brand-50: #F2F4F5;
+  --color-brand-100: #E6E9EB;
+  --color-brand-200: #C1C7CA;
+  --color-brand-300: #9CA4A9;
+  --color-brand-400: #778287;
+  --color-brand-500: #526066;
+  --color-brand-600: #3D4A4F;
+  --color-brand-700: #283438;
+  --color-brand-800: #131F22;
+  --color-brand-900: #0F171A;
+  
+  --color-accent: #E6E9EB;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-brand-900);
+    color: var(--color-brand-100);
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background: rgba(193, 199, 202, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(193, 199, 202, 0.15);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .glass-card {
+    background: linear-gradient(135deg, rgba(193, 199, 202, 0.1) 0%, rgba(193, 199, 202, 0.02) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(193, 199, 202, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .glass-card:hover {
+    border-color: rgba(193, 199, 202, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px -10px rgba(193, 199, 202, 0.2);
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #C1C7CA 0%, #9CA4A9 100%);
+    color: #0F171A;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #E6E9EB 0%, #C1C7CA 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(193, 199, 202, 0.3);
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-brand-900);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-600);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-500);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
