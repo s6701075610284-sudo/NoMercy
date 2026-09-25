@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { addExpense, getExpenses } from "@/app/actions/finance";
+import { addExpense, getExpenses, cancelExpense } from "@/app/actions/finance";
 import { useSession } from "next-auth/react";
-import { Banknote, Coins, Receipt, ArrowDownCircle, Clock } from "lucide-react";
+import { Banknote, Coins, Receipt, ArrowDownCircle, Clock, Trash2 } from "lucide-react";
 
 export function ExpensesContent() {
   const { data: session } = useSession();
@@ -52,6 +52,16 @@ export function ExpensesContent() {
       alert(err.message || "เกิดข้อผิดพลาดในการบันทึกรายจ่าย");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleCancelExpense = async (id: string) => {
+    if (!confirm("คุณต้องการยกเลิกบันทึกรายจ่ายนี้ใช่หรือไม่? (ยอดเงินจะถูกคืนกลับเข้าคลัง)")) return;
+    try {
+      await cancelExpense(id);
+      fetchData();
+    } catch (err: any) {
+      alert(err.message || "เกิดข้อผิดพลาดในการยกเลิกรายจ่าย");
     }
   };
 
@@ -163,6 +173,16 @@ export function ExpensesContent() {
                     </p>
                   </div>
                 </div>
+                
+                {isManager && (
+                  <button 
+                    onClick={() => handleCancelExpense(expense.id)}
+                    className="p-2 bg-red-900/50 text-red-400 hover:bg-red-600 hover:text-white rounded-lg transition-colors border border-red-800/50"
+                    title="ยกเลิกรายจ่ายนี้"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                )}
               </div>
             ))}
             

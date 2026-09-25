@@ -149,3 +149,21 @@ export async function getExpenses() {
   
   return expenses;
 }
+
+export async function cancelExpense(id: string) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) throw new Error("Unauthorized");
+  
+  // @ts-ignore
+  const role = session.user.role;
+  if (role !== "Moderator" && role !== "Boss" && role !== "Underboss" && role !== "Treasurer") {
+    throw new Error("ไม่มีสิทธิ์ยกเลิกรายจ่าย");
+  }
+
+  await prisma.expense.delete({
+    where: { id }
+  });
+
+  revalidatePath("/");
+  return { success: true };
+}
