@@ -80,25 +80,74 @@ export async function payFine(fineId: string, imageUrl: string) {
     throw new Error("ไม่ใช่ค่าปรับของคุณ");
   }
 
+  // Update fine status to PENDING
+  await prisma.fine.update({
+    where: { id: fineId },
+    data: {
+      status: "PENDING",
+      imageUrl,
+    }
+  });
+
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function approveFinePayment(fineId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) throw new Error("Unauthorized");
+
+  // @ts-ignore
+  const role = session.user.role;
+  if (role !== "Moderator" && role !== "Boss" && role !== "Underboss" && role !== "Treasurer") {
+    throw new Error("ไม่มีสิทธิ์อนุมัติค่าปรับ");
+  }
+
+  const fine = await prisma.fine.findUnique({ where: { id: fineId } });
+  if (!fine) throw new Error("ไม่พบข้อมูลค่าปรับ");
+  
+  if (fine.status !== "PENDING") {
+    throw new Error("ค่าปรับไม่ได้อยู่ในสถานะรอตรวจสอบ");
+  }
+
   // Update fine status and add to gang stash (Finance) in a single transaction
   await prisma.$transaction([
     prisma.fine.update({
       where: { id: fineId },
-      data: {
-        status: "PAID",
-        imageUrl,
-      }
+      data: { status: "PAID" }
     }),
     prisma.finance.create({
       data: {
-        userId: currentUserId,
-        type: "GREEN", // ค่าปรับเข้ากระเป๋าเงินเขียว
+        userId: fine.userId,
+        type: "GREEN",
         amount: fine.amount,
-        imageUrl: imageUrl,
+        imageUrl: fine.imageUrl,
         status: "APPROVED"
       }
     })
   ]);
+
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function rejectFinePayment(fineId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) throw new Error("Unauthorized");
+
+  // @ts-ignore
+  const role = session.user.role;
+  if (role !== "Moderator" && role !== "Boss" && role !== "Underboss" && role !== "Treasurer") {
+    throw new Error("ไม่มีสิทธิ์ปฏิเสธค่าปรับ");
+  }
+
+  await prisma.fine.update({
+    where: { id: fineId },
+    data: {
+      status: "UNPAID",
+      imageUrl: null,
+    }
+  });
 
   revalidatePath("/");
   return { success: true };

@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getFines, issueFine, payFine, cancelFine } from "@/app/actions/fines";
+import { getFines, issueFine, payFine, cancelFine, approveFinePayment, rejectFinePayment } from "@/app/actions/fines";
 import { getMembers } from "@/app/actions/members";
-import { AlertTriangle, PlusCircle, CheckCircle, Clock, Image as ImageIcon, Search } from "lucide-react";
+import { AlertTriangle, PlusCircle, CheckCircle, Clock, Image as ImageIcon, Search, Check, XCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 export function FinesContent() {
   const { data: session } = useSession();
   const currentUser = session?.user as any;
   const isBossOrUnderboss = currentUser?.role === "Moderator" || currentUser?.role === "Boss" || currentUser?.role === "Underboss";
+  const isManager = isBossOrUnderboss || currentUser?.role === "Treasurer";
   const currentUserId = currentUser?.id;
 
   const [fines, setFines] = useState<any[]>([]);
@@ -97,6 +98,25 @@ export function FinesContent() {
     }
   };
 
+  const handleApprove = async (id: string) => {
+    try {
+      await approveFinePayment(id);
+      fetchData();
+    } catch (err: any) {
+      alert(err.message || "เกิดข้อผิดพลาดในการอนุมัติ");
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    if (!confirm("คุณต้องการปฏิเสธสลิปนี้ใช่หรือไม่? (ใบสั่งจะกลับไปเป็นค้างชำระ)")) return;
+    try {
+      await rejectFinePayment(id);
+      fetchData();
+    } catch (err: any) {
+      alert(err.message || "เกิดข้อผิดพลาดในการปฏิเสธ");
+    }
+  };
+
   if (loading) {
     return <div className="p-8 text-center text-brand-400">กำลังโหลดระบบค่าปรับ...</div>;
   }
@@ -178,11 +198,11 @@ export function FinesContent() {
         {/* UNPAID FINES */}
         <div className="glass-card p-6 rounded-2xl flex flex-col h-full max-h-[700px]">
           <h3 className="text-lg font-bold text-red-400 mb-4 flex items-center gap-2">
-            <Clock className="w-5 h-5" /> ค้างชำระ ({fines.filter(f => f.status === "UNPAID").length})
+            <Clock className="w-5 h-5" /> ค้างชำระ / รอตรวจ ({fines.filter(f => f.status === "UNPAID" || f.status === "PENDING").length})
           </h3>
           <div className="flex-1 overflow-y-auto pr-2 space-y-4 custom-scrollbar">
-            {fines.filter(f => f.status === "UNPAID").map(fine => (
-              <div key={fine.id} className="bg-brand-900/50 border-l-4 border-l-red-500 border border-brand-800 rounded-r-xl p-4">
+            {fines.filter(f => f.status === "UNPAID" || f.status === "PENDING").map(fine => (
+              <div key={fine.id} className={`bg-brand-900/50 border-l-4 border rounded-r-xl p-4 ${fine.status === "PENDING" ? "border-l-yellow-500 border-yellow-500/30" : "border-l-red-500 border-brand-800"}`}>
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex items-center gap-3">
                     <img src={fine.user.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${fine.user.name}`} className="w-10 h-10 rounded-full border border-brand-700" alt="" />
@@ -191,36 +211,60 @@ export function FinesContent() {
                       <p className="text-xs text-brand-400">สั่งโดย: {fine.issuer.name}</p>
                     </div>
                   </div>
-                  <h4 className="text-xl font-bold text-red-400">${fine.amount.toLocaleString()}</h4>
+                  <h4 className={`text-xl font-bold ${fine.status === "PENDING" ? "text-yellow-500" : "text-red-400"}`}>${fine.amount.toLocaleString()}</h4>
                 </div>
                 <div className="bg-brand-950/50 rounded-lg p-3 text-sm text-brand-300 mt-2 mb-3">
                   <span className="text-brand-500 mr-2">ข้อหา:</span>{fine.reason}
                 </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-brand-500">{new Date(fine.createdAt).toLocaleString('th-TH')}</span>
-                  
-                  <div className="flex gap-2">
-                    {isBossOrUnderboss && (
-                      <button 
-                        onClick={() => handleCancelFine(fine.id)}
-                        className="bg-red-900/50 hover:bg-red-800 text-red-200 px-3 py-1.5 rounded-lg transition-colors border border-red-800/50"
-                      >
-                        ยกเลิก
-                      </button>
-                    )}
-                    {currentUserId === fine.userId && (
-                      <button 
-                        onClick={() => setPayFineId(fine.id)}
-                        className="bg-brand-700 hover:bg-brand-600 text-white px-4 py-1.5 rounded-lg transition-colors"
-                      >
-                        แจ้งชำระเงิน
-                      </button>
-                    )}
+                
+                {fine.status === "PENDING" ? (
+                  <div className="border-t border-brand-800 pt-3 mt-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded font-bold animate-pulse">รอตรวจสอบสลิป</span>
+                        <a href={fine.imageUrl} target="_blank" rel="noreferrer" className="text-brand-300 hover:text-white flex items-center gap-1 text-xs bg-brand-800 px-2 py-1 rounded">
+                          <ImageIcon className="w-3 h-3" /> ดูสลิป
+                        </a>
+                      </div>
+                      {isManager && (
+                        <div className="flex gap-2">
+                          <button onClick={() => handleApprove(fine.id)} className="bg-green-600/20 hover:bg-green-500 text-green-400 hover:text-white p-1.5 rounded-lg transition-colors border border-green-500/30" title="อนุมัติ">
+                            <Check className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleReject(fine.id)} className="bg-red-600/20 hover:bg-red-500 text-red-400 hover:text-white p-1.5 rounded-lg transition-colors border border-red-500/30" title="ปฏิเสธ">
+                            <XCircle className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-brand-500">{new Date(fine.createdAt).toLocaleString('th-TH')}</span>
+                    
+                    <div className="flex gap-2">
+                      {isBossOrUnderboss && (
+                        <button 
+                          onClick={() => handleCancelFine(fine.id)}
+                          className="bg-red-900/50 hover:bg-red-800 text-red-200 px-3 py-1.5 rounded-lg transition-colors border border-red-800/50"
+                        >
+                          ยกเลิก
+                        </button>
+                      )}
+                      {currentUserId === fine.userId && (
+                        <button 
+                          onClick={() => setPayFineId(fine.id)}
+                          className="bg-brand-700 hover:bg-brand-600 text-white px-4 py-1.5 rounded-lg transition-colors"
+                        >
+                          แจ้งชำระเงิน
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
-            {fines.filter(f => f.status === "UNPAID").length === 0 && (
+            {fines.filter(f => f.status === "UNPAID" || f.status === "PENDING").length === 0 && (
               <div className="text-center py-10 text-brand-500 text-sm">ไม่มีใบสั่งค้างชำระ ทุกคนทำตัวดีมาก!</div>
             )}
           </div>
