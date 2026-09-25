@@ -7,7 +7,11 @@ const prisma = new PrismaClient();
 export async function getDashboardStats() {
   const totalMembers = await prisma.user.count();
   
-  const finances = await prisma.finance.findMany();
+  const [finances, expenses] = await Promise.all([
+    prisma.finance.findMany({ where: { status: "APPROVED" } }),
+    prisma.expense.findMany()
+  ]);
+
   let totalGreen = 0;
   let totalRed = 0;
   
@@ -16,6 +20,10 @@ export async function getDashboardStats() {
     if (f.type === "RED") totalRed += f.amount;
   });
 
+  expenses.forEach(e => {
+    if (e.type === "GREEN") totalGreen -= e.amount;
+    if (e.type === "RED") totalRed -= e.amount;
+  });
   // Calculate check-ins in the last 24 hours
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
