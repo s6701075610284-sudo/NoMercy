@@ -47,6 +47,8 @@ model User {
   sessions      Session[]
   checkIns      CheckIn[]
   finances      Finance[]
+  fines         Fine[]    @relation("FinedUser")
+  issuedFines   Fine[]    @relation("FineIssuer")
 }
 
 model VerificationToken {
@@ -75,4 +77,19 @@ model Finance {
   createdAt DateTime @default(now())
   
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Fine {
+  id        String   @id @default(cuid())
+  userId    String
+  issuedBy  String
+  amount    Float
+  reason    String
+  status    String   @default("UNPAID") // "UNPAID" or "PAID"
+  imageUrl  String?  // Slip/Proof of payment
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user      User     @relation("FinedUser", fields: [userId], references: [id], onDelete: Cascade)
+  issuer    User     @relation("FineIssuer", fields: [issuedBy], references: [id], onDelete: Cascade)
 }

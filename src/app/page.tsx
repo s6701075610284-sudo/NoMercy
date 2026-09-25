@@ -9,6 +9,8 @@ import { RecentCheckIns } from '@/components/RecentCheckIns';
 import { CheckInModal } from '@/components/CheckInModal';
 import { CheckInContent } from '@/components/CheckInContent';
 import { DashboardStats } from '@/components/DashboardStats';
+import { FinesContent } from '@/components/FinesContent';
+import { AlertTriangle } from 'lucide-react';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -88,6 +90,10 @@ export default function Dashboard() {
             <button onClick={() => setActiveTab('stash')} className={`w-full flex items-center px-4 py-3 rounded-xl transition-all ${activeTab === 'stash' ? 'bg-brand-800/50 text-brand-100 border border-brand-600/50' : 'text-brand-400 hover:text-brand-100 hover:bg-brand-800/30'}`}>
               <Vault className="w-5 h-5 mr-3" />
               <span className="font-medium">คลัง & ส่งยอด</span>
+            </button>
+            <button onClick={() => setActiveTab('fines')} className={`w-full flex items-center px-4 py-3 rounded-xl transition-all ${activeTab === 'fines' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'text-brand-400 hover:text-red-400 hover:bg-brand-800/30'}`}>
+              <AlertTriangle className="w-5 h-5 mr-3" />
+              <span className="font-medium">ระบบค่าปรับ</span>
             </button>
           </nav>
         </div>
@@ -213,6 +219,10 @@ export default function Dashboard() {
 
         {activeTab === 'stash' && (
           <FinanceContent />
+        )}
+
+        {activeTab === 'fines' && (
+          <FinesContent />
         )}
       </main>
 
