@@ -7,10 +7,13 @@ const prisma = new PrismaClient();
 export async function getDashboardStats() {
   const totalMembers = await prisma.user.count();
   
-  const [finances, expenses] = await Promise.all([
+  const [finances, expenses, inventoryItems] = await Promise.all([
     prisma.finance.findMany({ where: { status: "APPROVED" } }),
-    prisma.expense.findMany()
+    prisma.expense.findMany(),
+    prisma.inventoryItem.findMany()
   ]);
+
+  const inventoryCount = inventoryItems.reduce((acc, item) => acc + item.quantity, 0);
 
   let totalGreen = 0;
   let totalRed = 0;
@@ -40,6 +43,7 @@ export async function getDashboardStats() {
     totalMembers,
     totalGreen,
     totalRed,
-    recentCheckIns
+    recentCheckIns,
+    inventoryCount
   };
 }

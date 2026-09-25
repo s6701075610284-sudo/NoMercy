@@ -5,7 +5,7 @@ import { Users, Banknote, Coins, ArrowUp, Crosshair } from "lucide-react";
 import { getDashboardStats } from "@/app/actions/stats";
 
 export function DashboardStats() {
-  const [stats, setStats] = useState({ totalMembers: 0, totalGreen: 0, totalRed: 0, recentCheckIns: 0 });
+  const [stats, setStats] = useState({ totalMembers: 0, totalGreen: 0, totalRed: 0, recentCheckIns: 0, inventoryCount: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -72,15 +72,15 @@ export function DashboardStats() {
       <div className="glass-card p-6 rounded-2xl animate-fade-in opacity-100 delay-300">
         <div className="flex justify-between items-start">
           <div>
-            <p className="text-brand-400 text-sm font-medium mb-1">อาวุธคงคลัง</p>
-            <h3 className="text-3xl font-bold text-brand-100">รอระบบ <span className="text-sm font-normal">อาวุธ</span></h3>
+            <p className="text-brand-400 text-sm font-medium mb-1">ของแก๊งคงคลัง</p>
+            <h3 className="text-3xl font-bold text-brand-100">{stats.inventoryCount || 0} <span className="text-sm font-normal">ชิ้น</span></h3>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-brand-500/20 text-brand-200 flex items-center justify-center border border-brand-500/30">
+          <div className="w-10 h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center border border-blue-500/30">
             <Crosshair className="w-5 h-5" />
           </div>
         </div>
         <div className="mt-4 flex items-center text-xs text-brand-400">
-          สถานะ: <span className="text-brand-400 ml-1">กำลังพัฒนา</span>
+          สถานะ: <span className="text-blue-400 ml-1 font-medium">พร้อมใช้งาน</span>
         </div>
       </div>
     </div>

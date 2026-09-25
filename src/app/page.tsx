@@ -11,7 +11,8 @@ import { CheckInContent } from '@/components/CheckInContent';
 import { DashboardStats } from '@/components/DashboardStats';
 import { FinesContent } from '@/components/FinesContent';
 import { ExpensesContent } from '@/components/ExpensesContent';
-import { AlertTriangle, Receipt } from 'lucide-react';
+import { InventoryContent } from '@/components/InventoryContent';
+import { AlertTriangle, Receipt, Box } from 'lucide-react';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -97,6 +98,10 @@ export default function Dashboard() {
             <button onClick={() => setActiveTab('expenses')} className={`w-full flex items-center px-4 py-3 rounded-xl transition-all ${activeTab === 'expenses' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/30' : 'text-brand-400 hover:text-orange-400 hover:bg-brand-800/30'}`}>
               <Receipt className="w-5 h-5 mr-3" />
               <span className="font-medium">รายจ่าย</span>
+            </button>
+            <button onClick={() => setActiveTab('inventory')} className={`w-full flex items-center px-4 py-3 rounded-xl transition-all ${activeTab === 'inventory' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30' : 'text-brand-400 hover:text-blue-400 hover:bg-brand-800/30'}`}>
+              <Box className="w-5 h-5 mr-3" />
+              <span className="font-medium">รายการของแก๊ง</span>
             </button>
           </nav>
         </div>
@@ -226,6 +231,10 @@ export default function Dashboard() {
 
         {activeTab === 'expenses' && (
           <ExpensesContent />
+        )}
+
+        {activeTab === 'inventory' && (
+          <InventoryContent />
         )}
       </main>
 
