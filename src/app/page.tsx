@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { signIn, signOut, useSession } from "next-auth/react";
-import { Crown, PieChart, Users, MapPin, Vault, Handshake, Settings, Camera, Bell, ArrowUp, Banknote, Coins, Crosshair, Image as ImageIcon, Info, X } from 'lucide-react';
+import { Crown, PieChart, Users, MapPin, Vault, Settings, Camera, Bell, ArrowUp, Banknote, Coins, Crosshair, Image as ImageIcon, Info, X } from 'lucide-react';
 import { MembersContent } from '@/components/MembersContent';
 import { FinanceContent } from '@/components/FinanceContent';
 import { RecentCheckIns } from '@/components/RecentCheckIns';
 import { CheckInModal } from '@/components/CheckInModal';
 import { CheckInContent } from '@/components/CheckInContent';
+import { DashboardStats } from '@/components/DashboardStats';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -88,10 +89,6 @@ export default function Dashboard() {
               <Vault className="w-5 h-5 mr-3" />
               <span className="font-medium">คลัง & ส่งยอด</span>
             </button>
-            <button onClick={() => alert("ระบบกำลังพัฒนา")} className="w-full flex items-center px-4 py-3 text-brand-400 hover:text-brand-100 hover:bg-brand-800/30 rounded-xl transition-all">
-              <Handshake className="w-5 h-5 mr-3" />
-              <span className="font-medium">การทูต</span>
-            </button>
           </nav>
         </div>
 
@@ -144,68 +141,7 @@ export default function Dashboard() {
           <div className="p-8 space-y-8 max-w-7xl mx-auto w-full">
             
             {/* Stats Row */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="glass-card p-6 rounded-2xl animate-fade-in opacity-0">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-brand-400 text-sm font-medium mb-1">สมาชิกในเมืองตอนนี้</p>
-                    <h3 className="text-3xl font-bold text-white">24 <span className="text-lg text-brand-400 font-normal">/ 50</span></h3>
-                  </div>
-                  <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center border border-green-500/20">
-                    <Users className="w-5 h-5" />
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center text-xs text-green-400">
-                  <ArrowUp className="w-3 h-3 mr-1" />
-                  <span>+5 จากชั่วโมงที่แล้ว</span>
-                </div>
-              </div>
-
-              <div className="glass-card p-6 rounded-2xl animate-fade-in opacity-0 delay-100">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-brand-400 text-sm font-medium mb-1">เงินกองกลาง (เขียว)</p>
-                    <h3 className="text-3xl font-bold text-brand-100">$2.4M</h3>
-                  </div>
-                  <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center border border-green-500/20">
-                    <Banknote className="w-5 h-5" />
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center text-xs text-brand-400">
-                  <span className="text-brand-200 font-medium mr-1">ล่าสุด:</span> +$50,000 (John)
-                </div>
-              </div>
-
-              <div className="glass-card p-6 rounded-2xl animate-fade-in opacity-0 delay-200">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-brand-400 text-sm font-medium mb-1">เงินกองกลาง (แดง)</p>
-                    <h3 className="text-3xl font-bold text-brand-100">$850K</h3>
-                  </div>
-                  <div className="w-10 h-10 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20">
-                    <Coins className="w-5 h-5" />
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center text-xs text-brand-400">
-                  <span className="text-brand-200 font-medium mr-1">เป้าหมาย:</span> $1M ภายในสัปดาห์นี้
-                </div>
-              </div>
-
-              <div className="glass-card p-6 rounded-2xl animate-fade-in opacity-0 delay-300">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-brand-400 text-sm font-medium mb-1">อาวุธคงคลัง</p>
-                    <h3 className="text-3xl font-bold text-brand-100">142 <span className="text-sm font-normal">ชิ้น</span></h3>
-                  </div>
-                  <div className="w-10 h-10 rounded-lg bg-brand-500/20 text-brand-200 flex items-center justify-center border border-brand-500/30">
-                    <Crosshair className="w-5 h-5" />
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center text-xs text-brand-400">
-                  สถานะ: <span className="text-green-400 ml-1">เพียงพอ</span>
-                </div>
-              </div>
-            </div>
+            <DashboardStats />
 
             {/* Main Panels */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
