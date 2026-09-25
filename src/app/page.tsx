@@ -8,9 +8,12 @@ import {
   Crosshair, Image as ImageIcon, Info, X 
 } from 'lucide-react';
 
+import { MembersContent } from '@/components/MembersContent';
+
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const [isCheckinModalOpen, setIsCheckinModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   if (status === "loading") {
     return (
@@ -70,26 +73,26 @@ export default function Dashboard() {
 
           {/* Navigation */}
           <nav className="mt-8 px-4 space-y-2">
-            <a href="#" className="flex items-center px-4 py-3 bg-brand-800/50 text-brand-100 rounded-xl border border-brand-600/50 transition-colors">
+            <button onClick={() => setActiveTab('dashboard')} className={`w-full flex items-center px-4 py-3 rounded-xl transition-all ${activeTab === 'dashboard' ? 'bg-brand-800/50 text-brand-100 border border-brand-600/50' : 'text-brand-400 hover:text-brand-100 hover:bg-brand-800/30'}`}>
               <PieChart className="w-5 h-5 mr-3" />
               <span className="font-medium">ภาพรวม (Dashboard)</span>
-            </a>
-            <a href="#" className="flex items-center px-4 py-3 text-brand-400 hover:text-brand-100 hover:bg-brand-800/30 rounded-xl transition-all">
+            </button>
+            <button onClick={() => setActiveTab('members')} className={`w-full flex items-center px-4 py-3 rounded-xl transition-all ${activeTab === 'members' ? 'bg-brand-800/50 text-brand-100 border border-brand-600/50' : 'text-brand-400 hover:text-brand-100 hover:bg-brand-800/30'}`}>
               <Users className="w-5 h-5 mr-3" />
               <span className="font-medium">จัดการสมาชิก</span>
-            </a>
-            <a href="#" className="flex items-center px-4 py-3 text-brand-400 hover:text-brand-100 hover:bg-brand-800/30 rounded-xl transition-all">
+            </button>
+            <button onClick={() => alert("ระบบกำลังพัฒนา")} className="w-full flex items-center px-4 py-3 text-brand-400 hover:text-brand-100 hover:bg-brand-800/30 rounded-xl transition-all">
               <MapPin className="w-5 h-5 mr-3" />
               <span className="font-medium">เช็คชื่อ (Check-in)</span>
-            </a>
-            <a href="#" className="flex items-center px-4 py-3 text-brand-400 hover:text-brand-100 hover:bg-brand-800/30 rounded-xl transition-all">
+            </button>
+            <button onClick={() => alert("ระบบกำลังพัฒนา")} className="w-full flex items-center px-4 py-3 text-brand-400 hover:text-brand-100 hover:bg-brand-800/30 rounded-xl transition-all">
               <Vault className="w-5 h-5 mr-3" />
               <span className="font-medium">คลัง & ส่งยอด</span>
-            </a>
-            <a href="#" className="flex items-center px-4 py-3 text-brand-400 hover:text-brand-100 hover:bg-brand-800/30 rounded-xl transition-all">
+            </button>
+            <button onClick={() => alert("ระบบกำลังพัฒนา")} className="w-full flex items-center px-4 py-3 text-brand-400 hover:text-brand-100 hover:bg-brand-800/30 rounded-xl transition-all">
               <Handshake className="w-5 h-5 mr-3" />
               <span className="font-medium">การทูต</span>
-            </a>
+            </button>
           </nav>
         </div>
 
@@ -137,193 +140,199 @@ export default function Dashboard() {
           </div>
         </header>
 
-        {/* Dashboard Content */}
-        <div className="p-8 space-y-8 max-w-7xl mx-auto w-full">
-          
-          {/* Stats Row */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="glass-card p-6 rounded-2xl animate-fade-in opacity-0">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-brand-400 text-sm font-medium mb-1">สมาชิกในเมืองตอนนี้</p>
-                  <h3 className="text-3xl font-bold text-white">24 <span className="text-lg text-brand-400 font-normal">/ 50</span></h3>
-                </div>
-                <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center border border-green-500/20">
-                  <Users className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-xs text-green-400">
-                <ArrowUp className="w-3 h-3 mr-1" />
-                <span>+5 จากชั่วโมงที่แล้ว</span>
-              </div>
-            </div>
-
-            <div className="glass-card p-6 rounded-2xl animate-fade-in opacity-0 delay-100">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-brand-400 text-sm font-medium mb-1">เงินกองกลาง (เขียว)</p>
-                  <h3 className="text-3xl font-bold text-brand-100">$2.4M</h3>
-                </div>
-                <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center border border-green-500/20">
-                  <Banknote className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-xs text-brand-400">
-                <span className="text-brand-200 font-medium mr-1">ล่าสุด:</span> +$50,000 (John)
-              </div>
-            </div>
-
-            <div className="glass-card p-6 rounded-2xl animate-fade-in opacity-0 delay-200">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-brand-400 text-sm font-medium mb-1">เงินกองกลาง (แดง)</p>
-                  <h3 className="text-3xl font-bold text-brand-100">$850K</h3>
-                </div>
-                <div className="w-10 h-10 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20">
-                  <Coins className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-xs text-brand-400">
-                <span className="text-brand-200 font-medium mr-1">เป้าหมาย:</span> $1M ภายในสัปดาห์นี้
-              </div>
-            </div>
-
-            <div className="glass-card p-6 rounded-2xl animate-fade-in opacity-0 delay-300">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-brand-400 text-sm font-medium mb-1">อาวุธคงคลัง</p>
-                  <h3 className="text-3xl font-bold text-brand-100">142 <span className="text-sm font-normal">ชิ้น</span></h3>
-                </div>
-                <div className="w-10 h-10 rounded-lg bg-brand-500/20 text-brand-200 flex items-center justify-center border border-brand-500/30">
-                  <Crosshair className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-xs text-brand-400">
-                สถานะ: <span className="text-green-400 ml-1">เพียงพอ</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Panels */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Dynamic Content */}
+        {activeTab === 'dashboard' && (
+          <div className="p-8 space-y-8 max-w-7xl mx-auto w-full">
             
-            {/* Recent Check-ins */}
-            <div className="lg:col-span-2 glass-card rounded-2xl p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-white">เช็คชื่อล่าสุด</h3>
-                <button className="text-sm text-brand-300 hover:text-white transition-colors">ดูทั้งหมด</button>
+            {/* Stats Row */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="glass-card p-6 rounded-2xl animate-fade-in opacity-0">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-brand-400 text-sm font-medium mb-1">สมาชิกในเมืองตอนนี้</p>
+                    <h3 className="text-3xl font-bold text-white">24 <span className="text-lg text-brand-400 font-normal">/ 50</span></h3>
+                  </div>
+                  <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center border border-green-500/20">
+                    <Users className="w-5 h-5" />
+                  </div>
+                </div>
+                <div className="mt-4 flex items-center text-xs text-green-400">
+                  <ArrowUp className="w-3 h-3 mr-1" />
+                  <span>+5 จากชั่วโมงที่แล้ว</span>
+                </div>
               </div>
-              
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="text-brand-400 border-b border-brand-800 text-sm">
-                      <th className="pb-3 font-medium w-1/2">สมาชิก</th>
-                      <th className="pb-3 font-medium">ยศ</th>
-                      <th className="pb-3 font-medium">เวลาเช็คชื่อ</th>
-                      <th className="pb-3 font-medium text-right">หลักฐาน</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-sm">
-                    <tr className="border-b border-brand-800/50 hover:bg-brand-800/20 transition-colors">
-                      <td className="py-4 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-brand-700 overflow-hidden">
-                          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jack" alt="avatar" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-brand-100">Jack Sniper</p>
-                          <p className="text-xs text-brand-400">STEAM_0:1:12345</p>
-                        </div>
-                      </td>
-                      <td className="py-4"><span className="px-2 py-1 rounded bg-brand-800 text-brand-200 text-xs font-medium border border-brand-600">Member</span></td>
-                      <td className="py-4 text-brand-300">10 นาทีที่แล้ว</td>
-                      <td className="py-4 text-right">
-                        <button className="text-brand-300 hover:text-white"><ImageIcon className="w-4 h-4 ml-auto" /></button>
-                      </td>
-                    </tr>
-                    <tr className="border-b border-brand-800/50 hover:bg-brand-800/20 transition-colors">
-                      <td className="py-4 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-brand-700 overflow-hidden">
-                          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mia" alt="avatar" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-brand-100">Mia Driver</p>
-                          <p className="text-xs text-brand-400">STEAM_0:1:99887</p>
-                        </div>
-                      </td>
-                      <td className="py-4"><span className="px-2 py-1 rounded bg-yellow-500/10 text-yellow-500 text-xs font-medium border border-yellow-500/20">Underboss</span></td>
-                      <td className="py-4 text-brand-300">45 นาทีที่แล้ว</td>
-                      <td className="py-4 text-right">
-                        <button className="text-brand-300 hover:text-white"><ImageIcon className="w-4 h-4 ml-auto" /></button>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-brand-800/20 transition-colors">
-                      <td className="py-4 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-brand-700 overflow-hidden">
-                          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Rook" alt="avatar" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-brand-100">Tom Rookie</p>
-                          <p className="text-xs text-brand-400">STEAM_0:1:55667</p>
-                        </div>
-                      </td>
-                      <td className="py-4"><span className="px-2 py-1 rounded bg-brand-800 text-brand-400 text-xs font-medium border border-brand-700">Rookie</span></td>
-                      <td className="py-4 text-brand-300">1 ชม. ที่แล้ว</td>
-                      <td className="py-4 text-right">
-                        <button className="text-brand-300 hover:text-white"><ImageIcon className="w-4 h-4 ml-auto" /></button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+
+              <div className="glass-card p-6 rounded-2xl animate-fade-in opacity-0 delay-100">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-brand-400 text-sm font-medium mb-1">เงินกองกลาง (เขียว)</p>
+                    <h3 className="text-3xl font-bold text-brand-100">$2.4M</h3>
+                  </div>
+                  <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center border border-green-500/20">
+                    <Banknote className="w-5 h-5" />
+                  </div>
+                </div>
+                <div className="mt-4 flex items-center text-xs text-brand-400">
+                  <span className="text-brand-200 font-medium mr-1">ล่าสุด:</span> +$50,000 (John)
+                </div>
+              </div>
+
+              <div className="glass-card p-6 rounded-2xl animate-fade-in opacity-0 delay-200">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-brand-400 text-sm font-medium mb-1">เงินกองกลาง (แดง)</p>
+                    <h3 className="text-3xl font-bold text-brand-100">$850K</h3>
+                  </div>
+                  <div className="w-10 h-10 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20">
+                    <Coins className="w-5 h-5" />
+                  </div>
+                </div>
+                <div className="mt-4 flex items-center text-xs text-brand-400">
+                  <span className="text-brand-200 font-medium mr-1">เป้าหมาย:</span> $1M ภายในสัปดาห์นี้
+                </div>
+              </div>
+
+              <div className="glass-card p-6 rounded-2xl animate-fade-in opacity-0 delay-300">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-brand-400 text-sm font-medium mb-1">อาวุธคงคลัง</p>
+                    <h3 className="text-3xl font-bold text-brand-100">142 <span className="text-sm font-normal">ชิ้น</span></h3>
+                  </div>
+                  <div className="w-10 h-10 rounded-lg bg-brand-500/20 text-brand-200 flex items-center justify-center border border-brand-500/30">
+                    <Crosshair className="w-5 h-5" />
+                  </div>
+                </div>
+                <div className="mt-4 flex items-center text-xs text-brand-400">
+                  สถานะ: <span className="text-green-400 ml-1">เพียงพอ</span>
+                </div>
               </div>
             </div>
 
-            {/* Finance / Quota Submit */}
-            <div className="glass-card rounded-2xl p-6 flex flex-col">
-              <h3 className="text-lg font-bold text-white mb-6">ส่งยอด / ภาษี</h3>
+            {/* Main Panels */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
-              <form className="space-y-4 flex-1">
-                <div>
-                  <label className="block text-xs font-medium text-brand-300 mb-1">ประเภทเงิน</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <label className="cursor-pointer">
-                      <input type="radio" name="moneyType" className="peer sr-only" defaultChecked />
-                      <div className="text-center py-2 rounded-lg border border-brand-600 bg-brand-800/50 peer-checked:border-green-500 peer-checked:text-green-400 text-brand-400 text-sm transition-all">
-                        เงินเขียว
-                      </div>
-                    </label>
-                    <label className="cursor-pointer">
-                      <input type="radio" name="moneyType" className="peer sr-only" />
-                      <div className="text-center py-2 rounded-lg border border-brand-600 bg-brand-800/50 peer-checked:border-red-500 peer-checked:text-red-400 text-brand-400 text-sm transition-all">
-                        เงินแดง
-                      </div>
-                    </label>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-brand-300 mb-1">จำนวนเงิน</label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-400">$</span>
-                    <input type="number" className="w-full bg-brand-900/50 border border-brand-700 rounded-lg py-2.5 pl-8 pr-4 text-white focus:outline-none focus:border-brand-300 transition-colors" placeholder="0" />
-                  </div>
+              {/* Recent Check-ins */}
+              <div className="lg:col-span-2 glass-card rounded-2xl p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-lg font-bold text-white">เช็คชื่อล่าสุด</h3>
+                  <button className="text-sm text-brand-300 hover:text-white transition-colors">ดูทั้งหมด</button>
                 </div>
                 
-                <div>
-                  <label className="block text-xs font-medium text-brand-300 mb-1">สลิป/หลักฐาน (ถ้ายัดตู้)</label>
-                  <div className="border-2 border-dashed border-brand-700 rounded-lg p-4 text-center cursor-pointer hover:border-brand-500 hover:bg-brand-800/30 transition-all flex flex-col items-center">
-                    <ImageIcon className="w-6 h-6 text-brand-400 mb-2" />
-                    <p className="text-xs text-brand-300">คลิกเพื่ออัปโหลดรูปภาพ</p>
-                  </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="text-brand-400 border-b border-brand-800 text-sm">
+                        <th className="pb-3 font-medium w-1/2">สมาชิก</th>
+                        <th className="pb-3 font-medium">ยศ</th>
+                        <th className="pb-3 font-medium">เวลาเช็คชื่อ</th>
+                        <th className="pb-3 font-medium text-right">หลักฐาน</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-sm">
+                      <tr className="border-b border-brand-800/50 hover:bg-brand-800/20 transition-colors">
+                        <td className="py-4 flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-brand-700 overflow-hidden">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jack" alt="avatar" />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-brand-100">Jack Sniper</p>
+                            <p className="text-xs text-brand-400">STEAM_0:1:12345</p>
+                          </div>
+                        </td>
+                        <td className="py-4"><span className="px-2 py-1 rounded bg-brand-800 text-brand-200 text-xs font-medium border border-brand-600">Member</span></td>
+                        <td className="py-4 text-brand-300">10 นาทีที่แล้ว</td>
+                        <td className="py-4 text-right">
+                          <button className="text-brand-300 hover:text-white"><ImageIcon className="w-4 h-4 ml-auto" /></button>
+                        </td>
+                      </tr>
+                      <tr className="border-b border-brand-800/50 hover:bg-brand-800/20 transition-colors">
+                        <td className="py-4 flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-brand-700 overflow-hidden">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mia" alt="avatar" />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-brand-100">Mia Driver</p>
+                            <p className="text-xs text-brand-400">STEAM_0:1:99887</p>
+                          </div>
+                        </td>
+                        <td className="py-4"><span className="px-2 py-1 rounded bg-yellow-500/10 text-yellow-500 text-xs font-medium border border-yellow-500/20">Underboss</span></td>
+                        <td className="py-4 text-brand-300">45 นาทีที่แล้ว</td>
+                        <td className="py-4 text-right">
+                          <button className="text-brand-300 hover:text-white"><ImageIcon className="w-4 h-4 ml-auto" /></button>
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-brand-800/20 transition-colors">
+                        <td className="py-4 flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-brand-700 overflow-hidden">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Rook" alt="avatar" />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-brand-100">Tom Rookie</p>
+                            <p className="text-xs text-brand-400">STEAM_0:1:55667</p>
+                          </div>
+                        </td>
+                        <td className="py-4"><span className="px-2 py-1 rounded bg-brand-800 text-brand-400 text-xs font-medium border border-brand-700">Rookie</span></td>
+                        <td className="py-4 text-brand-300">1 ชม. ที่แล้ว</td>
+                        <td className="py-4 text-right">
+                          <button className="text-brand-300 hover:text-white"><ImageIcon className="w-4 h-4 ml-auto" /></button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
+              </div>
 
-                <button type="button" className="w-full btn-primary py-3 rounded-xl font-bold mt-4 shadow-lg shadow-brand-200/10">
-                  ส่งยอด
-                </button>
-              </form>
+              {/* Finance / Quota Submit */}
+              <div className="glass-card rounded-2xl p-6 flex flex-col">
+                <h3 className="text-lg font-bold text-white mb-6">ส่งยอด / ภาษี</h3>
+                
+                <form className="space-y-4 flex-1">
+                  <div>
+                    <label className="block text-xs font-medium text-brand-300 mb-1">ประเภทเงิน</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <label className="cursor-pointer">
+                        <input type="radio" name="moneyType" className="peer sr-only" defaultChecked />
+                        <div className="text-center py-2 rounded-lg border border-brand-600 bg-brand-800/50 peer-checked:border-green-500 peer-checked:text-green-400 text-brand-400 text-sm transition-all">
+                          เงินเขียว
+                        </div>
+                      </label>
+                      <label className="cursor-pointer">
+                        <input type="radio" name="moneyType" className="peer sr-only" />
+                        <div className="text-center py-2 rounded-lg border border-brand-600 bg-brand-800/50 peer-checked:border-red-500 peer-checked:text-red-400 text-brand-400 text-sm transition-all">
+                          เงินแดง
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-brand-300 mb-1">จำนวนเงิน</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-400">$</span>
+                      <input type="number" className="w-full bg-brand-900/50 border border-brand-700 rounded-lg py-2.5 pl-8 pr-4 text-white focus:outline-none focus:border-brand-300 transition-colors" placeholder="0" />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-brand-300 mb-1">สลิป/หลักฐาน (ถ้ายัดตู้)</label>
+                    <div className="border-2 border-dashed border-brand-700 rounded-lg p-4 text-center cursor-pointer hover:border-brand-500 hover:bg-brand-800/30 transition-all flex flex-col items-center">
+                      <ImageIcon className="w-6 h-6 text-brand-400 mb-2" />
+                      <p className="text-xs text-brand-300">คลิกเพื่ออัปโหลดรูปภาพ</p>
+                    </div>
+                  </div>
+
+                  <button type="button" className="w-full btn-primary py-3 rounded-xl font-bold mt-4 shadow-lg shadow-brand-200/10">
+                    ส่งยอด
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {activeTab === 'members' && (
+          <MembersContent currentUserRole={(session?.user as any)?.role || "Member"} />
+        )}
       </main>
 
       {/* Check-in Modal Overlay */}
