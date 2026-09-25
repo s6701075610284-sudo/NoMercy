@@ -33,11 +33,11 @@ export default function Dashboard() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-400/10 blur-[120px] rounded-full pointer-events-none"></div>
         
         <div className="glass-card p-10 rounded-3xl max-w-md w-full mx-4 text-center z-10 animate-fade-in relative border border-brand-700/50">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-brand-300 to-white flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(193,199,202,0.2)]">
-            <Crown className="text-brand-900 w-10 h-10" />
+          <div className="w-24 h-24 mx-auto mb-6">
+            <img src="/LOGO_NO_MERCY.png" alt="No Mercy Logo" className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" />
           </div>
-          <h1 className="text-3xl font-bold tracking-wider text-white uppercase mb-2">
-            GANG<span className="text-brand-300">HUB</span>
+          <h1 className="text-3xl font-black tracking-widest text-white uppercase mb-2">
+            NO<span className="text-brand-300">MERCY</span>
           </h1>
           <p className="text-brand-400 mb-8 text-sm">เข้าสู่ระบบเพื่อจัดการข้อมูลแก๊งของคุณ</p>
           
@@ -63,12 +63,10 @@ export default function Dashboard() {
         <div>
           {/* Logo */}
           <div className="h-20 flex items-center px-8 border-b border-brand-800/50">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-200 to-white flex items-center justify-center mr-3 shadow-[0_0_15px_rgba(193,199,202,0.3)]">
-              <Crown className="text-brand-900 w-6 h-6" />
-            </div>
+            <img src="/LOGO_NO_MERCY.png" alt="Logo" className="w-10 h-10 object-contain mr-3 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
             <div>
-              <h1 className="text-xl font-bold tracking-wider text-brand-50 uppercase">
-                GANG<span className="text-brand-300">HUB</span>
+              <h1 className="text-xl font-black tracking-widest text-brand-50 uppercase">
+                NO<span className="text-brand-300">MERCY</span>
               </h1>
             </div>
           </div>

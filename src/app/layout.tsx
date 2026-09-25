@@ -15,8 +15,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "GANGHUB | FiveM System",
-  description: "Management system for FiveM gangs",
+  title: "NOMERCY | FiveM System",
+  description: "Management system for NO MERCY gang",
 };
 
 export default function RootLayout({
