@@ -133,10 +133,6 @@ export default function Dashboard() {
               <Camera className="w-4 h-4" />
               เช็คชื่อเข้าเมือง
             </button>
-            <div className="w-10 h-10 rounded-full glass-card flex items-center justify-center cursor-pointer relative">
-              <Bell className="w-5 h-5 text-brand-300" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-            </div>
           </div>
         </header>
 
