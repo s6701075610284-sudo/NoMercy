@@ -70,6 +70,27 @@ export async function updateInventoryItemQuantity(id: string, delta: number) {
   return { success: true };
 }
 
+export async function setInventoryItemQuantity(id: string, newQuantity: number) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) throw new Error("Unauthorized");
+  
+  // @ts-ignore
+  checkManagerRole(session.user.role);
+
+  if (newQuantity < 0) throw new Error("จำนวนไอเทมติดลบไม่ได้");
+
+  await prisma.inventoryItem.update({
+    where: { id },
+    data: { 
+      quantity: newQuantity,
+      updatedBy: session.user.name || "Manager"
+    }
+  });
+
+  revalidatePath("/");
+  return { success: true };
+}
+
 export async function deleteInventoryItem(id: string) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) throw new Error("Unauthorized");

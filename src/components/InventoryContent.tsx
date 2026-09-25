@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getInventory, addInventoryItem, updateInventoryItemQuantity, deleteInventoryItem } from "@/app/actions/inventory";
+import { getInventory, addInventoryItem, updateInventoryItemQuantity, deleteInventoryItem, setInventoryItemQuantity } from "@/app/actions/inventory";
 import { useSession } from "next-auth/react";
 import { Package, PlusCircle, MinusCircle, Trash2, Image as ImageIcon, Box } from "lucide-react";
 
@@ -20,11 +20,15 @@ export function InventoryContent() {
   const [holderName, setHolderName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const fetchData = async () => {
-    setLoading(true);
+  // Inline Edit State
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editingQuantity, setEditingQuantity] = useState("");
+
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     const data = await getInventory();
     setItems(data);
-    setLoading(false);
+    if (showLoading) setLoading(false);
   };
 
   useEffect(() => {
@@ -45,7 +49,7 @@ export function InventoryContent() {
       setQuantity("");
       setImageUrl("");
       setHolderName("");
-      fetchData();
+      fetchData(false);
     } catch (err: any) {
       alert(err.message || "เกิดข้อผิดพลาด");
     } finally {
@@ -56,17 +60,37 @@ export function InventoryContent() {
   const handleUpdateQuantity = async (id: string, delta: number) => {
     try {
       await updateInventoryItemQuantity(id, delta);
-      fetchData();
+      fetchData(false);
     } catch (err: any) {
       alert(err.message || "เกิดข้อผิดพลาด");
     }
+  };
+
+  const handleSetQuantity = async (id: string) => {
+    if (editingQuantity === "") {
+      setEditingItemId(null);
+      return;
+    }
+    const num = Number(editingQuantity);
+    if (isNaN(num) || num < 0) {
+      alert("กรุณาระบุจำนวนที่ถูกต้อง");
+      setEditingItemId(null);
+      return;
+    }
+    try {
+      await setInventoryItemQuantity(id, num);
+      fetchData(false);
+    } catch (err: any) {
+      alert(err.message || "เกิดข้อผิดพลาด");
+    }
+    setEditingItemId(null);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("คุณต้องการลบไอเทมนี้ออกจากคลังถาวรใช่หรือไม่?")) return;
     try {
       await deleteInventoryItem(id);
-      fetchData();
+      fetchData(false);
     } catch (err: any) {
       alert(err.message || "เกิดข้อผิดพลาด");
     }
@@ -196,9 +220,34 @@ export function InventoryContent() {
                         <MinusCircle className="w-5 h-5" />
                       </button>
                     )}
-                    <span className="font-mono font-bold text-xl text-white min-w-[3ch] text-center">
-                      {item.quantity.toLocaleString()}
-                    </span>
+                    {editingItemId === item.id ? (
+                      <input 
+                        type="number"
+                        value={editingQuantity}
+                        onChange={(e) => setEditingQuantity(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleSetQuantity(item.id);
+                          if (e.key === 'Escape') setEditingItemId(null);
+                        }}
+                        onBlur={() => handleSetQuantity(item.id)}
+                        autoFocus
+                        className="w-16 bg-brand-900 border border-brand-700 rounded p-1 text-center font-mono font-bold text-lg text-white focus:outline-none focus:border-brand-400"
+                        min="0"
+                      />
+                    ) : (
+                      <span 
+                        className={`font-mono font-bold text-xl text-white min-w-[3ch] text-center ${isManager ? 'cursor-pointer hover:text-brand-300' : ''}`}
+                        onClick={() => {
+                          if (isManager) {
+                            setEditingItemId(item.id);
+                            setEditingQuantity(item.quantity.toString());
+                          }
+                        }}
+                        title={isManager ? "คลิกเพื่อพิมพ์ตัวเลข" : ""}
+                      >
+                        {item.quantity.toLocaleString()}
+                      </span>
+                    )}
                     {isManager && (
                       <button 
                         onClick={() => handleUpdateQuantity(item.id, 1)}
