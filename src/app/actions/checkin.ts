@@ -21,6 +21,18 @@ export async function submitCheckIn(imageUrl: string) {
     throw new Error("กรุณาใส่ลิงก์รูปภาพหลักฐาน");
   }
 
+  // Check time constraint: Only allowed between 21:20 and 23:00 (BKK Time)
+  const bkkTime = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
+  const hour = bkkTime.getHours();
+  const minute = bkkTime.getMinutes();
+  const timeInMinutes = hour * 60 + minute;
+  const startMinutes = 21 * 60 + 20; // 21:20 = 1280
+  const endMinutes = 23 * 60;        // 23:00 = 1380
+
+  if (timeInMinutes < startMinutes || timeInMinutes > endMinutes) {
+    throw new Error("แก๊งเปิดรับเช็คชื่อเฉพาะช่วงเวลา 21:20 ถึง 23:00 เท่านั้นครับ!");
+  }
+
   await prisma.checkIn.create({
     data: {
       userId,

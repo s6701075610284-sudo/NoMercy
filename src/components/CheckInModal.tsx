@@ -66,7 +66,8 @@ export function CheckInModal({ onClose }: { onClose: () => void }) {
           <div className="bg-brand-800/50 border border-brand-700/50 rounded-lg p-3 flex items-start gap-3">
             <Info className="w-4 h-4 text-brand-400 mt-0.5 shrink-0" />
             <p className="text-xs text-brand-300 leading-relaxed">
-              ระบบจะบันทึกเวลาปัจจุบันอัตโนมัติ<br/>
+              <strong className="text-yellow-400">เช็คชื่อได้เฉพาะเวลา 21:20 - 23:00 น. เท่านั้น!</strong><br/>
+              ระบบจะบันทึกเวลาปัจจุบันอัตโนมัติ (อิงตามเวลาไทย)<br/>
               โปรดตรวจสอบให้แน่ใจว่ารูปภาพเห็นตัวละครชัดเจน
             </p>
           </div>
