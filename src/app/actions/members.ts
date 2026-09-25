@@ -15,6 +15,24 @@ export async function getMembers() {
     orderBy: { name: 'asc' }
   });
   
+  const roleOrder: Record<string, number> = {
+    "Moderator": 1,
+    "Boss": 2,
+    "Underboss": 3,
+    "Treasurer": 4,
+    "Member": 5,
+    "Rookie": 6
+  };
+
+  users.sort((a, b) => {
+    const orderA = roleOrder[a.role] || 99;
+    const orderB = roleOrder[b.role] || 99;
+    if (orderA !== orderB) {
+      return orderA - orderB;
+    }
+    return (a.name || "").localeCompare(b.name || "");
+  });
+
   return users;
 }
 
