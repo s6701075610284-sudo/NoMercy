@@ -20,7 +20,7 @@ export async function getInventory() {
   return items;
 }
 
-export async function addInventoryItem(data: { name: string; quantity: number; imageUrl?: string }) {
+export async function addInventoryItem(data: { name: string; quantity: number; imageUrl?: string; holderName?: string }) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) throw new Error("Unauthorized");
   
@@ -36,6 +36,7 @@ export async function addInventoryItem(data: { name: string; quantity: number; i
       name: data.name,
       quantity: data.quantity,
       imageUrl: data.imageUrl || null,
+      holderName: data.holderName || "คลังส่วนกลาง",
       updatedBy: session.user.name || "Manager",
     }
   });

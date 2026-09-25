@@ -17,6 +17,7 @@ export function InventoryContent() {
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [holderName, setHolderName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchData = async () => {
@@ -39,10 +40,11 @@ export function InventoryContent() {
     
     setIsSubmitting(true);
     try {
-      await addInventoryItem({ name, quantity: Number(quantity), imageUrl });
+      await addInventoryItem({ name, quantity: Number(quantity), imageUrl, holderName });
       setName("");
       setQuantity("");
       setImageUrl("");
+      setHolderName("");
       fetchData();
     } catch (err: any) {
       alert(err.message || "เกิดข้อผิดพลาด");
@@ -129,6 +131,17 @@ export function InventoryContent() {
                 />
               </div>
 
+              <div>
+                <label className="block text-xs font-medium text-brand-300 mb-2">ผู้ครอบครอง / สถานที่เก็บ</label>
+                <input 
+                  type="text" 
+                  value={holderName}
+                  onChange={(e) => setHolderName(e.target.value)}
+                  className="w-full bg-brand-900/50 border border-brand-700/50 rounded-xl py-2.5 px-4 text-white text-sm focus:outline-none focus:border-brand-400" 
+                  placeholder="เช่น คลังส่วนกลาง, พี่บอส, นาย A" 
+                />
+              </div>
+
               <button 
                 type="submit" 
                 disabled={isSubmitting}
@@ -161,7 +174,12 @@ export function InventoryContent() {
                   </div>
                   <div>
                     <h4 className="font-bold text-white text-lg">{item.name}</h4>
-                    <p className="text-xs text-brand-500">อัปเดตโดย: {item.updatedBy}</p>
+                    {item.holderName && (
+                      <p className="text-xs font-medium text-yellow-400 mb-1 bg-yellow-400/10 inline-block px-2 py-0.5 rounded border border-yellow-400/20 mt-1">
+                        อยู่กับ: {item.holderName}
+                      </p>
+                    )}
+                    <p className="text-[11px] text-brand-500 mt-1">อัปเดตโดย: {item.updatedBy}</p>
                     <p className="text-[10px] text-brand-600">{new Date(item.updatedAt).toLocaleString('th-TH')}</p>
                   </div>
                 </div>
