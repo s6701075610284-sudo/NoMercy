@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 export function FinesContent() {
   const { data: session } = useSession();
   const currentUser = session?.user as any;
-  const isBossOrUnderboss = currentUser?.role === "Boss" || currentUser?.role === "Underboss";
+  const isBossOrUnderboss = currentUser?.role === "Moderator" || currentUser?.role === "Boss" || currentUser?.role === "Underboss";
   const currentUserId = currentUser?.id;
 
   const [fines, setFines] = useState<any[]>([]);

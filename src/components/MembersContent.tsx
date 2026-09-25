@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getMembers, updateMemberRole } from "@/app/actions/members";
 import { User } from "@prisma/client";
-import { Shield, ShieldAlert, Crown, User as UserIcon, Wallet } from "lucide-react";
+import { Shield, ShieldAlert, Crown, User as UserIcon, Wallet, Star } from "lucide-react";
 
 export function MembersContent({ currentUserRole }: { currentUserRole: string }) {
   const [members, setMembers] = useState<User[]>([]);
@@ -21,7 +21,7 @@ export function MembersContent({ currentUserRole }: { currentUserRole: string })
   }, []);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
-    if (currentUserRole !== "Boss" && currentUserRole !== "Underboss") {
+    if (currentUserRole !== "Moderator" && currentUserRole !== "Boss" && currentUserRole !== "Underboss") {
       alert("คุณไม่มีสิทธิ์ในการเปลี่ยนยศสมาชิก!");
       return;
     }
@@ -76,12 +76,14 @@ export function MembersContent({ currentUserRole }: { currentUserRole: string })
                 </td>
                 <td className="py-4 px-6">
                   <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                    member.role === 'Moderator' ? 'bg-purple-500/10 text-purple-400 border-purple-500/30' :
                     member.role === 'Boss' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30' :
                     member.role === 'Underboss' ? 'bg-orange-500/10 text-orange-400 border-orange-500/30' :
                     member.role === 'Treasurer' ? 'bg-green-500/10 text-green-400 border-green-500/30' :
                     member.role === 'Rookie' ? 'bg-gray-500/10 text-gray-400 border-gray-500/30' :
                     'bg-brand-500/10 text-brand-300 border-brand-500/30'
                   }`}>
+                    {member.role === 'Moderator' && <Star className="w-3 h-3 inline mr-1 -mt-0.5" />}
                     {member.role === 'Boss' && <Crown className="w-3 h-3 inline mr-1 -mt-0.5" />}
                     {member.role === 'Underboss' && <ShieldAlert className="w-3 h-3 inline mr-1 -mt-0.5" />}
                     {member.role === 'Treasurer' && <Wallet className="w-3 h-3 inline mr-1 -mt-0.5" />}
@@ -91,13 +93,19 @@ export function MembersContent({ currentUserRole }: { currentUserRole: string })
                   </span>
                 </td>
                 <td className="py-4 px-6 text-right">
-                  {(currentUserRole === "Boss" || currentUserRole === "Underboss") ? (
+                  {member.role === "Moderator" ? (
+                    <span className="text-purple-400 font-bold text-xs">⭐ ผู้คุมระบบสูงสุด</span>
+                  ) : (currentUserRole === "Moderator" || currentUserRole === "Boss" || currentUserRole === "Underboss") ? (
                     <select 
                       className="bg-brand-900 border border-brand-700 text-brand-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-brand-400 cursor-pointer"
                       value={member.role}
                       onChange={(e) => handleRoleChange(member.id, e.target.value)}
-                      disabled={member.role === "Boss" && currentUserRole !== "Boss"} // Underboss can't change Boss
+                      disabled={
+                        (member.role === "Boss" && currentUserRole !== "Moderator" && currentUserRole !== "Boss") || 
+                        (currentUserRole === "Underboss" && member.role === "Underboss")
+                      }
                     >
+                      {currentUserRole === "Moderator" && <option value="Moderator">Moderator</option>}
                       <option value="Boss">Boss</option>
                       <option value="Underboss">Underboss</option>
                       <option value="Treasurer">Treasurer</option>

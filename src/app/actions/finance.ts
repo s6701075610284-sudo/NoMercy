@@ -69,8 +69,8 @@ export async function approveFinance(id: string) {
   
   // @ts-ignore
   const role = session.user.role;
-  if (role !== "Boss" && role !== "Underboss" && role !== "Treasurer") {
-    throw new Error("ไม่มีสิทธิ์อนุมัติยอดเงิน (ต้องเป็น Boss, Underboss หรือ Treasurer)");
+  if (role !== "Moderator" && role !== "Boss" && role !== "Underboss" && role !== "Treasurer") {
+    throw new Error("ไม่มีสิทธิ์อนุมัติยอดเงิน (ต้องเป็น Moderator, Boss, Underboss หรือ Treasurer)");
   }
 
   await prisma.finance.update({
@@ -88,7 +88,7 @@ export async function rejectFinance(id: string) {
   
   // @ts-ignore
   const role = session.user.role;
-  if (role !== "Boss" && role !== "Underboss" && role !== "Treasurer") {
+  if (role !== "Moderator" && role !== "Boss" && role !== "Underboss" && role !== "Treasurer") {
     throw new Error("ไม่มีสิทธิ์ปฏิเสธยอดเงิน");
   }
 

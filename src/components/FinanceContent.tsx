@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 export function FinanceContent() {
   const { data: session } = useSession();
   const currentUser = session?.user as any;
-  const isManager = currentUser?.role === "Boss" || currentUser?.role === "Underboss" || currentUser?.role === "Treasurer";
+  const isManager = currentUser?.role === "Moderator" || currentUser?.role === "Boss" || currentUser?.role === "Underboss" || currentUser?.role === "Treasurer";
 
   const [finances, setFinances] = useState<any[]>([]);
   const [stats, setStats] = useState({ totalGreen: 0, totalRed: 0 });

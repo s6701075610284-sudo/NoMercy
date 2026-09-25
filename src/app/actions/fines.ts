@@ -19,8 +19,8 @@ export async function issueFine(data: { userId: string; amount: number; reason: 
   // @ts-ignore
   const issuerRole = session.user.role;
 
-  if (issuerRole !== "Boss" && issuerRole !== "Underboss") {
-    throw new Error("ไม่มีสิทธิ์ออกใบสั่งค่าปรับ (ต้องเป็นระดับ Boss หรือ Underboss เท่านั้น)");
+  if (issuerRole !== "Moderator" && issuerRole !== "Boss" && issuerRole !== "Underboss") {
+    throw new Error("ไม่มีสิทธิ์ออกใบสั่งค่าปรับ (ต้องเป็นระดับ Moderator, Boss หรือ Underboss เท่านั้น)");
   }
 
   if (!data.amount || data.amount <= 0) {
@@ -54,7 +54,7 @@ export async function cancelFine(fineId: string) {
   // @ts-ignore
   const issuerRole = session.user.role;
 
-  if (issuerRole !== "Boss" && issuerRole !== "Underboss") {
+  if (issuerRole !== "Moderator" && issuerRole !== "Boss" && issuerRole !== "Underboss") {
     throw new Error("ไม่มีสิทธิ์ยกเลิกใบสั่ง");
   }
 

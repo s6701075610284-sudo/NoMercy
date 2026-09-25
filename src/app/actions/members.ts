@@ -27,8 +27,21 @@ export async function updateMemberRole(userId: string, newRole: string) {
 
   // Allow only Boss or Underboss to change roles
   // @ts-ignore
-  if (session.user.role !== "Boss" && session.user.role !== "Underboss") {
-    throw new Error("Permission Denied: Only Boss or Underboss can manage roles.");
+  const callerRole = session.user.role;
+
+  if (callerRole !== "Moderator" && callerRole !== "Boss" && callerRole !== "Underboss") {
+    throw new Error("Permission Denied: Only Moderator, Boss, or Underboss can manage roles.");
+  }
+
+  const targetUser = await prisma.user.findUnique({ where: { id: userId } });
+  if (!targetUser) throw new Error("User not found");
+
+  if (targetUser.role === "Moderator" && callerRole !== "Moderator") {
+    throw new Error("Permission Denied: Cannot change a Moderator's role.");
+  }
+
+  if (newRole === "Moderator" && callerRole !== "Moderator") {
+    throw new Error("Permission Denied: Only a Moderator can assign the Moderator role.");
   }
 
   await prisma.user.update({
