@@ -2,13 +2,9 @@
 
 import { useState } from 'react';
 import { signIn, signOut, useSession } from "next-auth/react";
-import { 
-  Crown, PieChart, Users, MapPin, Vault, Handshake, 
-  Settings, Camera, Bell, ArrowUp, Banknote, Coins, 
-  Crosshair, Image as ImageIcon, Info, X 
-} from 'lucide-react';
-
+import { Crown, PieChart, Users, MapPin, Vault, Handshake, Settings, Camera, Bell, ArrowUp, Banknote, Coins, Crosshair, Image as ImageIcon, Info, X } from 'lucide-react';
 import { MembersContent } from '@/components/MembersContent';
+import { FinanceContent } from '@/components/FinanceContent';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -85,7 +81,7 @@ export default function Dashboard() {
               <MapPin className="w-5 h-5 mr-3" />
               <span className="font-medium">เช็คชื่อ (Check-in)</span>
             </button>
-            <button onClick={() => alert("ระบบกำลังพัฒนา")} className="w-full flex items-center px-4 py-3 text-brand-400 hover:text-brand-100 hover:bg-brand-800/30 rounded-xl transition-all">
+            <button onClick={() => setActiveTab('stash')} className={`w-full flex items-center px-4 py-3 rounded-xl transition-all ${activeTab === 'stash' ? 'bg-brand-800/50 text-brand-100 border border-brand-600/50' : 'text-brand-400 hover:text-brand-100 hover:bg-brand-800/30'}`}>
               <Vault className="w-5 h-5 mr-3" />
               <span className="font-medium">คลัง & ส่งยอด</span>
             </button>
@@ -332,6 +328,10 @@ export default function Dashboard() {
 
         {activeTab === 'members' && (
           <MembersContent currentUserRole={(session?.user as any)?.role || "Member"} />
+        )}
+
+        {activeTab === 'stash' && (
+          <FinanceContent />
         )}
       </main>
 
