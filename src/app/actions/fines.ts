@@ -58,13 +58,24 @@ export async function payFine(fineId: string, imageUrl: string) {
     throw new Error("ไม่ใช่ค่าปรับของคุณ");
   }
 
-  await prisma.fine.update({
-    where: { id: fineId },
-    data: {
-      status: "PAID",
-      imageUrl,
-    }
-  });
+  // Update fine status and add to gang stash (Finance) in a single transaction
+  await prisma.$transaction([
+    prisma.fine.update({
+      where: { id: fineId },
+      data: {
+        status: "PAID",
+        imageUrl,
+      }
+    }),
+    prisma.finance.create({
+      data: {
+        userId: currentUserId,
+        type: "GREEN", // ค่าปรับเข้ากระเป๋าเงินเขียว
+        amount: fine.amount,
+        imageUrl: imageUrl,
+      }
+    })
+  ]);
 
   revalidatePath("/");
   return { success: true };
