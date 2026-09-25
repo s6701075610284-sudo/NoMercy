@@ -5,6 +5,9 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { Crown, PieChart, Users, MapPin, Vault, Handshake, Settings, Camera, Bell, ArrowUp, Banknote, Coins, Crosshair, Image as ImageIcon, Info, X } from 'lucide-react';
 import { MembersContent } from '@/components/MembersContent';
 import { FinanceContent } from '@/components/FinanceContent';
+import { RecentCheckIns } from '@/components/RecentCheckIns';
+import { CheckInModal } from '@/components/CheckInModal';
+import { CheckInContent } from '@/components/CheckInContent';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -77,7 +80,7 @@ export default function Dashboard() {
               <Users className="w-5 h-5 mr-3" />
               <span className="font-medium">จัดการสมาชิก</span>
             </button>
-            <button onClick={() => alert("ระบบกำลังพัฒนา")} className="w-full flex items-center px-4 py-3 text-brand-400 hover:text-brand-100 hover:bg-brand-800/30 rounded-xl transition-all">
+            <button onClick={() => setActiveTab('checkin')} className={`w-full flex items-center px-4 py-3 rounded-xl transition-all ${activeTab === 'checkin' ? 'bg-brand-800/50 text-brand-100 border border-brand-600/50' : 'text-brand-400 hover:text-brand-100 hover:bg-brand-800/30'}`}>
               <MapPin className="w-5 h-5 mr-3" />
               <span className="font-medium">เช็คชื่อ (Check-in)</span>
             </button>
@@ -211,71 +214,9 @@ export default function Dashboard() {
               <div className="lg:col-span-2 glass-card rounded-2xl p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-lg font-bold text-white">เช็คชื่อล่าสุด</h3>
-                  <button className="text-sm text-brand-300 hover:text-white transition-colors">ดูทั้งหมด</button>
+                  <button onClick={() => setActiveTab('checkin')} className="text-sm text-brand-300 hover:text-white transition-colors">ดูทั้งหมด</button>
                 </div>
-                
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left">
-                    <thead>
-                      <tr className="text-brand-400 border-b border-brand-800 text-sm">
-                        <th className="pb-3 font-medium w-1/2">สมาชิก</th>
-                        <th className="pb-3 font-medium">ยศ</th>
-                        <th className="pb-3 font-medium">เวลาเช็คชื่อ</th>
-                        <th className="pb-3 font-medium text-right">หลักฐาน</th>
-                      </tr>
-                    </thead>
-                    <tbody className="text-sm">
-                      <tr className="border-b border-brand-800/50 hover:bg-brand-800/20 transition-colors">
-                        <td className="py-4 flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-brand-700 overflow-hidden">
-                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jack" alt="avatar" />
-                          </div>
-                          <div>
-                            <p className="font-semibold text-brand-100">Jack Sniper</p>
-                            <p className="text-xs text-brand-400">STEAM_0:1:12345</p>
-                          </div>
-                        </td>
-                        <td className="py-4"><span className="px-2 py-1 rounded bg-brand-800 text-brand-200 text-xs font-medium border border-brand-600">Member</span></td>
-                        <td className="py-4 text-brand-300">10 นาทีที่แล้ว</td>
-                        <td className="py-4 text-right">
-                          <button className="text-brand-300 hover:text-white"><ImageIcon className="w-4 h-4 ml-auto" /></button>
-                        </td>
-                      </tr>
-                      <tr className="border-b border-brand-800/50 hover:bg-brand-800/20 transition-colors">
-                        <td className="py-4 flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-brand-700 overflow-hidden">
-                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mia" alt="avatar" />
-                          </div>
-                          <div>
-                            <p className="font-semibold text-brand-100">Mia Driver</p>
-                            <p className="text-xs text-brand-400">STEAM_0:1:99887</p>
-                          </div>
-                        </td>
-                        <td className="py-4"><span className="px-2 py-1 rounded bg-yellow-500/10 text-yellow-500 text-xs font-medium border border-yellow-500/20">Underboss</span></td>
-                        <td className="py-4 text-brand-300">45 นาทีที่แล้ว</td>
-                        <td className="py-4 text-right">
-                          <button className="text-brand-300 hover:text-white"><ImageIcon className="w-4 h-4 ml-auto" /></button>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-brand-800/20 transition-colors">
-                        <td className="py-4 flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-brand-700 overflow-hidden">
-                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Rook" alt="avatar" />
-                          </div>
-                          <div>
-                            <p className="font-semibold text-brand-100">Tom Rookie</p>
-                            <p className="text-xs text-brand-400">STEAM_0:1:55667</p>
-                          </div>
-                        </td>
-                        <td className="py-4"><span className="px-2 py-1 rounded bg-brand-800 text-brand-400 text-xs font-medium border border-brand-700">Rookie</span></td>
-                        <td className="py-4 text-brand-300">1 ชม. ที่แล้ว</td>
-                        <td className="py-4 text-right">
-                          <button className="text-brand-300 hover:text-white"><ImageIcon className="w-4 h-4 ml-auto" /></button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                <RecentCheckIns />
               </div>
 
               {/* Finance / Quota Submit */}
@@ -330,6 +271,10 @@ export default function Dashboard() {
           <MembersContent currentUserRole={(session?.user as any)?.role || "Member"} />
         )}
 
+        {activeTab === 'checkin' && (
+          <CheckInContent />
+        )}
+
         {activeTab === 'stash' && (
           <FinanceContent />
         )}
@@ -337,49 +282,7 @@ export default function Dashboard() {
 
       {/* Check-in Modal Overlay */}
       {isCheckinModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center opacity-100 transition-opacity">
-          <div className="glass-card w-full max-w-md rounded-2xl p-6 m-4 relative border-brand-200/30 animate-fade-in">
-            <button 
-              onClick={() => setIsCheckinModalOpen(false)} 
-              className="absolute top-4 right-4 text-brand-400 hover:text-white"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 rounded-full bg-brand-200/10 text-brand-200 flex items-center justify-center mx-auto mb-4 border border-brand-200/30 shadow-[0_0_20px_rgba(193,199,202,0.2)]">
-                <MapPin className="w-8 h-8" />
-              </div>
-              <h3 className="text-2xl font-bold text-white">เช็คชื่อเข้าเมือง</h3>
-              <p className="text-brand-400 text-sm mt-1">อัปโหลดภาพสกรีนช็อตในเกมของคุณเพื่อยืนยัน</p>
-            </div>
-
-            <div className="space-y-5">
-              <div className="border-2 border-dashed border-brand-500/50 bg-brand-900/50 rounded-xl p-8 text-center cursor-pointer hover:border-brand-300 transition-all group flex flex-col items-center">
-                <div className="w-12 h-12 rounded-full bg-brand-800 group-hover:bg-brand-700 flex items-center justify-center mx-auto mb-3 transition-colors">
-                  <ImageIcon className="w-6 h-6 text-brand-300" />
-                </div>
-                <p className="text-brand-200 font-medium text-sm">คลิกเพื่อเลือกไฟล์รูปภาพ</p>
-                <p className="text-brand-500 text-xs mt-1">รองรับ JPG, PNG (สูงสุด 5MB)</p>
-              </div>
-
-              <div className="bg-brand-800/50 border border-brand-700/50 rounded-lg p-3 flex items-start gap-3">
-                <Info className="w-4 h-4 text-brand-400 mt-0.5 shrink-0" />
-                <p className="text-xs text-brand-300 leading-relaxed">
-                  ระบบจะบันทึกเวลา <span className="text-brand-100 font-medium">09:30 น.</span> อัตโนมัติ<br/>
-                  โปรดตรวจสอบให้แน่ใจว่ารูปภาพเห็นตัวละครชัดเจน
-                </p>
-              </div>
-
-              <button 
-                onClick={() => setIsCheckinModalOpen(false)}
-                className="w-full btn-primary py-3.5 rounded-xl font-bold text-lg shadow-[0_0_20px_rgba(193,199,202,0.15)]"
-              >
-                ยืนยันการเช็คชื่อ
-              </button>
-            </div>
-          </div>
-        </div>
+        <CheckInModal onClose={() => setIsCheckinModalOpen(false)} />
       )}
 
     </div>
