@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getMembers, updateMemberRole } from "@/app/actions/members";
 import { User } from "@prisma/client";
-import { Shield, ShieldAlert, Crown, User as UserIcon } from "lucide-react";
+import { Shield, ShieldAlert, Crown, User as UserIcon, Wallet } from "lucide-react";
 
 export function MembersContent({ currentUserRole }: { currentUserRole: string }) {
   const [members, setMembers] = useState<User[]>([]);
@@ -78,11 +78,13 @@ export function MembersContent({ currentUserRole }: { currentUserRole: string })
                   <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
                     member.role === 'Boss' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30' :
                     member.role === 'Underboss' ? 'bg-orange-500/10 text-orange-400 border-orange-500/30' :
+                    member.role === 'Treasurer' ? 'bg-green-500/10 text-green-400 border-green-500/30' :
                     member.role === 'Rookie' ? 'bg-gray-500/10 text-gray-400 border-gray-500/30' :
                     'bg-brand-500/10 text-brand-300 border-brand-500/30'
                   }`}>
                     {member.role === 'Boss' && <Crown className="w-3 h-3 inline mr-1 -mt-0.5" />}
                     {member.role === 'Underboss' && <ShieldAlert className="w-3 h-3 inline mr-1 -mt-0.5" />}
+                    {member.role === 'Treasurer' && <Wallet className="w-3 h-3 inline mr-1 -mt-0.5" />}
                     {member.role === 'Member' && <Shield className="w-3 h-3 inline mr-1 -mt-0.5" />}
                     {member.role === 'Rookie' && <UserIcon className="w-3 h-3 inline mr-1 -mt-0.5" />}
                     {member.role}
@@ -98,6 +100,7 @@ export function MembersContent({ currentUserRole }: { currentUserRole: string })
                     >
                       <option value="Boss">Boss</option>
                       <option value="Underboss">Underboss</option>
+                      <option value="Treasurer">Treasurer</option>
                       <option value="Member">Member</option>
                       <option value="Rookie">Rookie</option>
                     </select>

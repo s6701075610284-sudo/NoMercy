@@ -44,6 +44,28 @@ export async function issueFine(data: { userId: string; amount: number; reason: 
   return { success: true };
 }
 
+export async function cancelFine(fineId: string) {
+  const session = await getServerSession(authOptions);
+  
+  if (!session || !session.user) {
+    throw new Error("Unauthorized");
+  }
+
+  // @ts-ignore
+  const issuerRole = session.user.role;
+
+  if (issuerRole !== "Boss" && issuerRole !== "Underboss") {
+    throw new Error("ไม่มีสิทธิ์ยกเลิกใบสั่ง");
+  }
+
+  await prisma.fine.delete({
+    where: { id: fineId }
+  });
+
+  revalidatePath("/");
+  return { success: true };
+}
+
 export async function payFine(fineId: string, imageUrl: string) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) throw new Error("Unauthorized");
@@ -73,6 +95,7 @@ export async function payFine(fineId: string, imageUrl: string) {
         type: "GREEN", // ค่าปรับเข้ากระเป๋าเงินเขียว
         amount: fine.amount,
         imageUrl: imageUrl,
+        status: "APPROVED"
       }
     })
   ]);

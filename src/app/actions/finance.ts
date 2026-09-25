@@ -48,7 +48,9 @@ export async function getFinances() {
 }
 
 export async function getFinanceStats() {
-  const finances = await prisma.finance.findMany();
+  const finances = await prisma.finance.findMany({
+    where: { status: "APPROVED" }
+  });
   
   let totalGreen = 0;
   let totalRed = 0;
@@ -59,4 +61,42 @@ export async function getFinanceStats() {
   });
 
   return { totalGreen, totalRed };
+}
+
+export async function approveFinance(id: string) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) throw new Error("Unauthorized");
+  
+  // @ts-ignore
+  const role = session.user.role;
+  if (role !== "Boss" && role !== "Underboss" && role !== "Treasurer") {
+    throw new Error("ไม่มีสิทธิ์อนุมัติยอดเงิน (ต้องเป็น Boss, Underboss หรือ Treasurer)");
+  }
+
+  await prisma.finance.update({
+    where: { id },
+    data: { status: "APPROVED" }
+  });
+
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function rejectFinance(id: string) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) throw new Error("Unauthorized");
+  
+  // @ts-ignore
+  const role = session.user.role;
+  if (role !== "Boss" && role !== "Underboss" && role !== "Treasurer") {
+    throw new Error("ไม่มีสิทธิ์ปฏิเสธยอดเงิน");
+  }
+
+  await prisma.finance.update({
+    where: { id },
+    data: { status: "REJECTED" }
+  });
+
+  revalidatePath("/");
+  return { success: true };
 }

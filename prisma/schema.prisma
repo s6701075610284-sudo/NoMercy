@@ -74,6 +74,7 @@ model Finance {
   type      String   // "GREEN" or "RED"
   amount    Float
   imageUrl  String?  // Slip/Proof
+  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
   createdAt DateTime @default(now())
   
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)

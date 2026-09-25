@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getFines, issueFine, payFine } from "@/app/actions/fines";
+import { getFines, issueFine, payFine, cancelFine } from "@/app/actions/fines";
 import { getMembers } from "@/app/actions/members";
 import { AlertTriangle, PlusCircle, CheckCircle, Clock, Image as ImageIcon, Search } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -83,6 +83,17 @@ export function FinesContent() {
       alert(err.message || "เกิดข้อผิดพลาด");
     } finally {
       setIsPaying(false);
+    }
+  };
+
+  const handleCancelFine = async (fineId: string) => {
+    if (!confirm("คุณต้องการยกเลิกใบสั่งนี้ใช่หรือไม่?")) return;
+    try {
+      await cancelFine(fineId);
+      alert("ยกเลิกใบสั่งสำเร็จ");
+      fetchData();
+    } catch (err: any) {
+      alert(err.message || "เกิดข้อผิดพลาด");
     }
   };
 
@@ -188,14 +199,24 @@ export function FinesContent() {
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-brand-500">{new Date(fine.createdAt).toLocaleString('th-TH')}</span>
                   
-                  {currentUserId === fine.userId && (
-                    <button 
-                      onClick={() => setPayFineId(fine.id)}
-                      className="bg-brand-700 hover:bg-brand-600 text-white px-4 py-1.5 rounded-lg transition-colors"
-                    >
-                      แจ้งชำระเงิน
-                    </button>
-                  )}
+                  <div className="flex gap-2">
+                    {isBossOrUnderboss && (
+                      <button 
+                        onClick={() => handleCancelFine(fine.id)}
+                        className="bg-red-900/50 hover:bg-red-800 text-red-200 px-3 py-1.5 rounded-lg transition-colors border border-red-800/50"
+                      >
+                        ยกเลิก
+                      </button>
+                    )}
+                    {currentUserId === fine.userId && (
+                      <button 
+                        onClick={() => setPayFineId(fine.id)}
+                        className="bg-brand-700 hover:bg-brand-600 text-white px-4 py-1.5 rounded-lg transition-colors"
+                      >
+                        แจ้งชำระเงิน
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
