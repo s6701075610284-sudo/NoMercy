@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { submitFinance, getFinances, getFinanceStats, approveFinance, rejectFinance } from "@/app/actions/finance";
-import { Banknote, Coins, Image as ImageIcon, ArrowUpRight, Clock, PlusCircle, Check, X, ShieldCheck } from "lucide-react";
+import { submitFinance, getFinances, getFinanceStats, approveFinance, rejectFinance, getMemberContributions } from "@/app/actions/finance";
+import { Banknote, Coins, Image as ImageIcon, ArrowUpRight, Clock, PlusCircle, Check, X, ShieldCheck, Users } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 export function FinanceContent() {
@@ -11,8 +11,12 @@ export function FinanceContent() {
   const isManager = currentUser?.role === "Moderator" || currentUser?.role === "Boss" || currentUser?.role === "Underboss" || currentUser?.role === "Treasurer";
 
   const [finances, setFinances] = useState<any[]>([]);
+  const [memberContributions, setMemberContributions] = useState<any[]>([]);
   const [stats, setStats] = useState({ totalGreen: 0, totalRed: 0 });
   const [loading, setLoading] = useState(true);
+  
+  // View State
+  const [viewMode, setViewMode] = useState<"HISTORY" | "LEADERBOARD">("HISTORY");
   
   // Form State
   const [type, setType] = useState("GREEN");
@@ -22,12 +26,14 @@ export function FinanceContent() {
 
   const fetchData = async () => {
     setLoading(true);
-    const [financeData, statsData] = await Promise.all([
+    const [financeData, statsData, contributionsData] = await Promise.all([
       getFinances(),
-      getFinanceStats()
+      getFinanceStats(),
+      getMemberContributions()
     ]);
     setFinances(financeData);
     setStats(statsData);
+    setMemberContributions(contributionsData);
     setLoading(false);
   };
 
@@ -188,82 +194,145 @@ export function FinanceContent() {
 
         {/* History Log */}
         <div className="glass-card rounded-2xl p-6 lg:col-span-2 flex flex-col h-full max-h-[600px]">
-          <div className="flex items-center gap-2 mb-6">
-            <Clock className="w-5 h-5 text-brand-300" />
-            <h3 className="text-lg font-bold text-white">ประวัติการส่งยอด (รอการตรวจสอบ & อนุมัติแล้ว)</h3>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-2">
+              {viewMode === "HISTORY" ? <Clock className="w-5 h-5 text-brand-300" /> : <Users className="w-5 h-5 text-brand-300" />}
+              <h3 className="text-lg font-bold text-white">
+                {viewMode === "HISTORY" ? "ประวัติการส่งยอด" : "ยอดรวมแต่ละคน"}
+              </h3>
+            </div>
+            
+            <div className="flex bg-brand-900/50 rounded-lg p-1 border border-brand-800 shrink-0">
+              <button 
+                onClick={() => setViewMode("HISTORY")}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === "HISTORY" ? "bg-brand-700 text-white" : "text-brand-400 hover:text-white"}`}
+              >
+                ประวัติล่าสุด
+              </button>
+              <button 
+                onClick={() => setViewMode("LEADERBOARD")}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === "LEADERBOARD" ? "bg-brand-700 text-white" : "text-brand-400 hover:text-white"}`}
+              >
+                ยอดรวมสมาชิก
+              </button>
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto pr-2 space-y-4 custom-scrollbar">
-            {/* PENDING FINANCES */}
-            {finances.filter(f => f.status === "PENDING").map((finance) => (
-              <div key={finance.id} className="bg-yellow-500/10 border-l-4 border-l-yellow-500 border-r border-t border-b border-brand-800 rounded-r-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center border ${
-                    finance.type === "GREEN" ? "bg-green-500/20 text-green-400 border-green-500/30" : "bg-red-500/20 text-red-400 border-red-500/30"
-                  }`}>
-                    {finance.type === "GREEN" ? <Banknote className="w-6 h-6" /> : <Coins className="w-6 h-6" />}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-bold text-white text-lg">${finance.amount.toLocaleString()}</p>
-                      <span className="bg-yellow-500/20 text-yellow-500 text-[10px] px-2 py-0.5 rounded font-bold">รอตรวจสอบ</span>
+            {viewMode === "HISTORY" ? (
+              <>
+                {/* PENDING FINANCES */}
+                {finances.filter(f => f.status === "PENDING").map((finance) => (
+                  <div key={finance.id} className="bg-yellow-500/10 border-l-4 border-l-yellow-500 border-r border-t border-b border-brand-800 rounded-r-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center border ${
+                        finance.type === "GREEN" ? "bg-green-500/20 text-green-400 border-green-500/30" : "bg-red-500/20 text-red-400 border-red-500/30"
+                      }`}>
+                        {finance.type === "GREEN" ? <Banknote className="w-6 h-6" /> : <Coins className="w-6 h-6" />}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-bold text-white text-lg">${finance.amount.toLocaleString()}</p>
+                          <span className="bg-yellow-500/20 text-yellow-500 text-[10px] px-2 py-0.5 rounded font-bold">รอตรวจสอบ</span>
+                        </div>
+                        <p className="text-xs text-brand-400">
+                          โดย <span className="text-brand-200 font-medium">{finance.user.name}</span> • 
+                          {new Date(finance.createdAt).toLocaleString('th-TH')}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-xs text-brand-400">
-                      โดย <span className="text-brand-200 font-medium">{finance.user.name}</span> • 
-                      {new Date(finance.createdAt).toLocaleString('th-TH')}
-                    </p>
+                    
+                    <div className="flex items-center gap-2">
+                      {finance.imageUrl && (
+                        <a href={finance.imageUrl} target="_blank" rel="noreferrer" className="text-brand-400 hover:text-white p-2 bg-brand-800/50 rounded-lg transition-colors" title="ดูหลักฐาน">
+                          <ImageIcon className="w-5 h-5" />
+                        </a>
+                      )}
+                      {isManager && (
+                        <>
+                          <button onClick={() => handleReject(finance.id)} className="p-2 bg-red-900/50 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors" title="ปฏิเสธ">
+                            <X className="w-5 h-5" />
+                          </button>
+                          <button onClick={() => handleApprove(finance.id)} className="p-2 bg-green-900/50 text-green-400 hover:bg-green-500 hover:text-white rounded-lg transition-colors" title="อนุมัติ">
+                            <Check className="w-5 h-5" />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  {finance.imageUrl && (
-                    <a href={finance.imageUrl} target="_blank" rel="noreferrer" className="text-brand-400 hover:text-white p-2 bg-brand-800/50 rounded-lg transition-colors" title="ดูหลักฐาน">
-                      <ImageIcon className="w-5 h-5" />
-                    </a>
-                  )}
-                  {isManager && (
-                    <>
-                      <button onClick={() => handleReject(finance.id)} className="p-2 bg-red-900/50 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors" title="ปฏิเสธ">
-                        <X className="w-5 h-5" />
-                      </button>
-                      <button onClick={() => handleApprove(finance.id)} className="p-2 bg-green-900/50 text-green-400 hover:bg-green-500 hover:text-white rounded-lg transition-colors" title="อนุมัติ">
-                        <Check className="w-5 h-5" />
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
+                ))}
 
-            {/* APPROVED FINANCES */}
-            {finances.filter(f => f.status === "APPROVED").map((finance) => (
-              <div key={finance.id} className="bg-brand-900/30 border border-brand-800 rounded-xl p-4 flex items-center justify-between hover:bg-brand-800/30 transition-colors opacity-80">
-                <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
-                    finance.type === "GREEN" ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-red-500/10 text-red-500 border-red-500/20"
-                  }`}>
-                    {finance.type === "GREEN" ? <Banknote className="w-5 h-5" /> : <Coins className="w-5 h-5" />}
+                {/* APPROVED FINANCES */}
+                {finances.filter(f => f.status === "APPROVED").map((finance) => (
+                  <div key={finance.id} className="bg-brand-900/30 border border-brand-800 rounded-xl p-4 flex items-center justify-between hover:bg-brand-800/30 transition-colors opacity-80">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
+                        finance.type === "GREEN" ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-red-500/10 text-red-500 border-red-500/20"
+                      }`}>
+                        {finance.type === "GREEN" ? <Banknote className="w-5 h-5" /> : <Coins className="w-5 h-5" />}
+                      </div>
+                      <div>
+                        <p className="font-bold text-white text-base">${finance.amount.toLocaleString()}</p>
+                        <p className="text-[11px] text-brand-500 flex items-center gap-1">
+                          <ShieldCheck className="w-3 h-3 text-green-500" /> อนุมัติแล้ว • <span className="text-brand-300">{finance.user.name}</span>
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {finance.imageUrl && (
+                      <a href={finance.imageUrl} target="_blank" rel="noreferrer" className="text-brand-500 hover:text-brand-300 transition-colors" title="ดูหลักฐาน">
+                        <ImageIcon className="w-4 h-4" />
+                      </a>
+                    )}
                   </div>
-                  <div>
-                    <p className="font-bold text-white text-base">${finance.amount.toLocaleString()}</p>
-                    <p className="text-[11px] text-brand-500 flex items-center gap-1">
-                      <ShieldCheck className="w-3 h-3 text-green-500" /> อนุมัติแล้ว • <span className="text-brand-300">{finance.user.name}</span>
-                    </p>
-                  </div>
-                </div>
+                ))}
                 
-                {finance.imageUrl && (
-                  <a href={finance.imageUrl} target="_blank" rel="noreferrer" className="text-brand-500 hover:text-brand-300 transition-colors" title="ดูหลักฐาน">
-                    <ImageIcon className="w-4 h-4" />
-                  </a>
+                {finances.length === 0 && (
+                  <div className="text-center py-10 text-brand-500">
+                    ยังไม่มีประวัติการส่งยอด
+                  </div>
                 )}
-              </div>
-            ))}
-            
-            {finances.length === 0 && (
-              <div className="text-center py-10 text-brand-500">
-                ยังไม่มีประวัติการส่งยอด
-              </div>
+              </>
+            ) : (
+              <>
+                {/* LEADERBOARD VIEW */}
+                <div className="space-y-3">
+                  {memberContributions.map((member, idx) => (
+                    <div key={member.id} className="bg-brand-800/20 border border-brand-700/50 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-brand-700 overflow-hidden flex-shrink-0">
+                          <img src={member.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`} alt="" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-white flex items-center gap-2">
+                            {member.name}
+                          </p>
+                          <p className="text-xs text-brand-400 mt-1">
+                            จ่ายแล้วรวมเทียบเท่า: <span className="text-brand-200 font-bold">{Math.floor((member.totalGreen + member.totalRed) / 100000)}</span> สัปดาห์ (100K/สัปดาห์)
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 bg-brand-900/50 p-2 rounded-lg border border-brand-800 shrink-0">
+                        <div className="text-right">
+                          <p className="text-[10px] text-brand-500 uppercase tracking-wider font-bold mb-0.5">เขียว</p>
+                          <p className="text-green-400 font-bold text-sm">${member.totalGreen.toLocaleString()}</p>
+                        </div>
+                        <div className="w-px h-8 bg-brand-800"></div>
+                        <div className="text-right">
+                          <p className="text-[10px] text-brand-500 uppercase tracking-wider font-bold mb-0.5">แดง</p>
+                          <p className="text-red-400 font-bold text-sm">${member.totalRed.toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {memberContributions.length === 0 && (
+                    <div className="text-center py-10 text-brand-500">
+                      ยังไม่มียอดรวมของสมาชิก
+                    </div>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </div>

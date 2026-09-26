@@ -47,6 +47,42 @@ export async function getFinances() {
   return finances;
 }
 
+export async function getMemberContributions() {
+  const approvedFinances = await prisma.finance.findMany({
+    where: { status: "APPROVED" },
+    include: {
+      user: {
+        select: { id: true, name: true, image: true, role: true }
+      }
+    }
+  });
+
+  const memberMap = new Map<string, any>();
+
+  for (const f of approvedFinances) {
+    if (!memberMap.has(f.user.id)) {
+      memberMap.set(f.user.id, {
+        id: f.user.id,
+        name: f.user.name,
+        image: f.user.image,
+        role: f.user.role,
+        totalGreen: 0,
+        totalRed: 0,
+      });
+    }
+
+    const member = memberMap.get(f.user.id);
+    if (f.type === "GREEN") {
+      member.totalGreen += f.amount;
+    } else if (f.type === "RED") {
+      member.totalRed += f.amount;
+    }
+  }
+
+  // Convert map to array and sort by total amount
+  return Array.from(memberMap.values()).sort((a, b) => (b.totalGreen + b.totalRed) - (a.totalGreen + a.totalRed));
+}
+
 export async function getFinanceStats() {
   const [finances, expenses] = await Promise.all([
     prisma.finance.findMany({ where: { status: "APPROVED" } }),
