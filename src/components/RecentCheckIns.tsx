@@ -1,17 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getRecentCheckIns } from "@/app/actions/checkin";
-import { Image as ImageIcon } from "lucide-react";
+import { getRecentCheckIns, getAbsentMembers } from "@/app/actions/checkin";
+import { Image as ImageIcon, UserX } from "lucide-react";
 
 export function RecentCheckIns() {
   const [checkIns, setCheckIns] = useState<any[]>([]);
+  const [absent, setAbsent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const data = await getRecentCheckIns(5);
-      setCheckIns(data);
+      const [checkinData, absentData] = await Promise.all([
+        getRecentCheckIns(5),
+        getAbsentMembers()
+      ]);
+      setCheckIns(checkinData);
+      setAbsent(absentData);
       setLoading(false);
     }
     load();
@@ -70,6 +75,24 @@ export function RecentCheckIns() {
           )}
         </tbody>
       </table>
+
+      {absent.length > 0 && (
+        <div className="mt-8">
+          <h4 className="text-sm font-bold text-red-400 mb-3 flex items-center gap-2">
+            <UserX className="w-4 h-4" /> ยังไม่มาเช็คชื่อ ({absent.length} คน)
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {absent.map(user => (
+              <div key={user.id} className="bg-red-500/10 border border-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-xs flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full overflow-hidden bg-brand-800">
+                  <img src={user.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} alt="" />
+                </div>
+                {user.name}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

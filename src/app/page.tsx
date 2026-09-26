@@ -132,7 +132,13 @@ export default function Dashboard() {
         <header className="h-20 glass-panel border-b border-brand-800/50 flex items-center justify-between px-8 sticky top-0 z-20">
           <div>
             <h2 className="text-2xl font-bold text-white tracking-wide">ภาพรวมแก๊ง</h2>
-            <p className="text-sm text-brand-400">อัปเดตข้อมูลล่าสุด: วันนี้ 09:30 น.</p>
+            <p className="text-sm text-brand-400 flex items-center gap-1">
+              <span className="relative flex h-2 w-2 mr-1">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              อัปเดตข้อมูลล่าสุดแบบ Real-time
+            </p>
           </div>
           
           <div className="flex items-center gap-4">

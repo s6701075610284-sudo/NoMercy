@@ -21,16 +21,17 @@ export async function submitCheckIn(imageUrl: string) {
     throw new Error("กรุณาใส่ลิงก์รูปภาพหลักฐาน");
   }
 
-  // Check time constraint: Only allowed between 21:20 and 23:00 (BKK Time)
+  // Check time constraint: Only allowed 21:20-21:40 and 23:00-23:20 (BKK Time)
   const bkkTime = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
   const hour = bkkTime.getHours();
   const minute = bkkTime.getMinutes();
   const timeInMinutes = hour * 60 + minute;
-  const startMinutes = 21 * 60 + 20; // 21:20 = 1280
-  const endMinutes = 23 * 60;        // 23:00 = 1380
+  
+  const isPeriod1 = timeInMinutes >= (21 * 60 + 20) && timeInMinutes <= (21 * 60 + 40);
+  const isPeriod2 = timeInMinutes >= (23 * 60) && timeInMinutes <= (23 * 60 + 20);
 
-  if (timeInMinutes < startMinutes || timeInMinutes > endMinutes) {
-    throw new Error("แก๊งเปิดรับเช็คชื่อเฉพาะช่วงเวลา 21:20 ถึง 23:00 เท่านั้นครับ!");
+  if (!isPeriod1 && !isPeriod2) {
+    throw new Error("แก๊งเปิดรับเช็คชื่อเฉพาะ 21:20-21:40 และ 23:00-23:20 เท่านั้นครับ!");
   }
 
   await prisma.checkIn.create({
@@ -56,4 +57,27 @@ export async function getRecentCheckIns(limit = 10) {
   });
   
   return checkIns;
+}
+
+export async function getAbsentMembers() {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  // Find all users
+  const allUsers = await prisma.user.findMany({
+    select: { id: true, name: true, image: true, role: true, steamId: true }
+  });
+
+  // Find all checkins in the last 24 hours
+  const recentCheckIns = await prisma.checkIn.findMany({
+    where: { createdAt: { gte: yesterday } },
+    select: { userId: true }
+  });
+
+  const checkedInUserIds = new Set(recentCheckIns.map(c => c.userId));
+  
+  // Filter out users who checked in
+  const absentUsers = allUsers.filter(u => !checkedInUserIds.has(u.id));
+  
+  return absentUsers;
 }
