@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/remind-checkin",
+      "schedule": "15 14 * * *"
+    },
+    {
+      "path": "/api/cron/remind-checkin",
+      "schedule": "55 15 * * *"
+    }
+  ]
+}
