@@ -65,7 +65,7 @@ export function DashboardStats() {
           </div>
         </div>
         <div className="mt-4 flex items-center text-xs text-brand-400">
-          <span className="text-brand-200 font-medium mr-1">เป้าหมาย:</span> $1M ภายในสัปดาห์นี้
+          <span className="text-brand-200 font-medium mr-1">อัปเดตแบบเรียลไทม์</span>
         </div>
       </div>
 

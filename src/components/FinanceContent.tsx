@@ -108,11 +108,7 @@ export function FinanceContent() {
           <p className="text-brand-300 font-medium mb-2 relative z-10">ยอดเงินแดงรวมในคลัง</p>
           <h3 className="text-5xl font-bold text-white relative z-10">${stats.totalRed.toLocaleString()}</h3>
           <div className="mt-4 flex items-center text-sm text-brand-400 relative z-10">
-            เป้าหมายฟอกเงิน: <span className="text-brand-100 ml-2">$1,000,000</span>
-          </div>
-          {/* Progress Bar */}
-          <div className="w-full bg-brand-900 rounded-full h-2 mt-3 overflow-hidden relative z-10">
-            <div className="bg-red-500 h-2 rounded-full" style={{ width: `${Math.min((stats.totalRed / 1000000) * 100, 100)}%` }}></div>
+            อัปเดตล่าสุดเมื่อสักครู่
           </div>
         </div>
       </div>
