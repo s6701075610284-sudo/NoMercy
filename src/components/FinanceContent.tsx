@@ -307,8 +307,15 @@ export function FinanceContent() {
                           <p className="font-bold text-white flex items-center gap-2">
                             {member.name}
                           </p>
-                          <p className="text-xs text-brand-400 mt-1">
-                            จ่ายแล้วรวมเทียบเท่า: <span className="text-brand-200 font-bold">{Math.floor((member.totalGreen + member.totalRed) / 100000)}</span> สัปดาห์ (100K/สัปดาห์)
+                          <p className="text-xs text-brand-400 mt-1 flex flex-wrap items-center gap-1.5">
+                            สถานะ: 
+                            {member.balance === 0 ? (
+                              <span className="text-brand-200 font-bold bg-brand-800/50 px-2 py-0.5 rounded">พอดีเป้า</span>
+                            ) : member.balance > 0 ? (
+                              <span className="text-green-400 font-bold bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">จ่ายล่วงหน้า +{Math.floor(member.balance / 100000)} สัปดาห์ (+${member.balance.toLocaleString()})</span>
+                            ) : (
+                              <span className="text-red-400 font-bold bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">ค้างจ่าย -${Math.abs(member.balance).toLocaleString()}</span>
+                            )}
                           </p>
                         </div>
                       </div>

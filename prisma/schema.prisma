@@ -42,6 +42,7 @@ model User {
   image         String?
   role          String    @default("Member") // Boss, Underboss, Member, Rookie
   steamId       String?   @unique
+  createdAt     DateTime  @default(now())
   
   accounts      Account[]
   sessions      Session[]

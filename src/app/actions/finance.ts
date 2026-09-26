@@ -48,39 +48,55 @@ export async function getFinances() {
 }
 
 export async function getMemberContributions() {
-  const approvedFinances = await prisma.finance.findMany({
-    where: { status: "APPROVED" },
-    include: {
-      user: {
-        select: { id: true, name: true, image: true, role: true }
-      }
-    }
+  const users = await prisma.user.findMany({
+    select: { id: true, name: true, image: true, role: true, createdAt: true }
+  });
+
+  const finances = await prisma.finance.findMany({
+    where: { status: "APPROVED" }
   });
 
   const memberMap = new Map<string, any>();
 
-  for (const f of approvedFinances) {
-    if (!memberMap.has(f.user.id)) {
-      memberMap.set(f.user.id, {
-        id: f.user.id,
-        name: f.user.name,
-        image: f.user.image,
-        role: f.user.role,
-        totalGreen: 0,
-        totalRed: 0,
-      });
-    }
+  for (const u of users) {
+    memberMap.set(u.id, {
+      id: u.id,
+      name: u.name,
+      image: u.image,
+      role: u.role,
+      createdAt: u.createdAt,
+      totalGreen: 0,
+      totalRed: 0,
+      expectedQuota: 0,
+      balance: 0
+    });
+  }
 
-    const member = memberMap.get(f.user.id);
-    if (f.type === "GREEN") {
-      member.totalGreen += f.amount;
-    } else if (f.type === "RED") {
-      member.totalRed += f.amount;
+  for (const f of finances) {
+    if (memberMap.has(f.userId)) {
+      const m = memberMap.get(f.userId);
+      if (f.type === "GREEN") m.totalGreen += f.amount;
+      else if (f.type === "RED") m.totalRed += f.amount;
     }
   }
 
-  // Convert map to array and sort by total amount
-  return Array.from(memberMap.values()).sort((a, b) => (b.totalGreen + b.totalRed) - (a.totalGreen + a.totalRed));
+  // Calculate expected quota (Saturdays passed)
+  const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
+  for (const m of memberMap.values()) {
+    let d = new Date(m.createdAt.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
+    d.setDate(d.getDate() + 1);
+    d.setHours(0,0,0,0);
+    let count = 0;
+    while (d <= now) {
+      if (d.getDay() === 6) count++;
+      d.setDate(d.getDate() + 1);
+    }
+    m.expectedQuota = count * 100000;
+    m.balance = (m.totalGreen + m.totalRed) - m.expectedQuota;
+  }
+
+  // Sort by balance (highest first)
+  return Array.from(memberMap.values()).sort((a, b) => b.balance - a.balance);
 }
 
 export async function getFinanceStats() {
