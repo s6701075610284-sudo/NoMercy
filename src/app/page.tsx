@@ -12,6 +12,7 @@ import { DashboardStats } from '@/components/DashboardStats';
 import { FinesContent } from '@/components/FinesContent';
 import { ExpensesContent } from '@/components/ExpensesContent';
 import { InventoryContent } from '@/components/InventoryContent';
+import { QuickFinanceForm } from '@/components/QuickFinanceForm';
 import { AlertTriangle, Receipt, Box } from 'lucide-react';
 
 export default function Dashboard() {
@@ -173,47 +174,8 @@ export default function Dashboard() {
 
               {/* Finance / Quota Submit */}
               <div className="glass-card rounded-2xl p-6 flex flex-col">
-                <h3 className="text-lg font-bold text-white mb-6">ส่งยอด / ภาษี</h3>
-                
-                <form className="space-y-4 flex-1">
-                  <div>
-                    <label className="block text-xs font-medium text-brand-300 mb-1">ประเภทเงิน</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <label className="cursor-pointer">
-                        <input type="radio" name="moneyType" className="peer sr-only" defaultChecked />
-                        <div className="text-center py-2 rounded-lg border border-brand-600 bg-brand-800/50 peer-checked:border-green-500 peer-checked:text-green-400 text-brand-400 text-sm transition-all">
-                          เงินเขียว
-                        </div>
-                      </label>
-                      <label className="cursor-pointer">
-                        <input type="radio" name="moneyType" className="peer sr-only" />
-                        <div className="text-center py-2 rounded-lg border border-brand-600 bg-brand-800/50 peer-checked:border-red-500 peer-checked:text-red-400 text-brand-400 text-sm transition-all">
-                          เงินแดง
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-brand-300 mb-1">จำนวนเงิน</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-400">$</span>
-                      <input type="number" className="w-full bg-brand-900/50 border border-brand-700 rounded-lg py-2.5 pl-8 pr-4 text-white focus:outline-none focus:border-brand-300 transition-colors" placeholder="0" />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-xs font-medium text-brand-300 mb-1">สลิป/หลักฐาน (ถ้ายัดตู้)</label>
-                    <div className="border-2 border-dashed border-brand-700 rounded-lg p-4 text-center cursor-pointer hover:border-brand-500 hover:bg-brand-800/30 transition-all flex flex-col items-center">
-                      <ImageIcon className="w-6 h-6 text-brand-400 mb-2" />
-                      <p className="text-xs text-brand-300">คลิกเพื่ออัปโหลดรูปภาพ</p>
-                    </div>
-                  </div>
-
-                  <button type="button" className="w-full btn-primary py-3 rounded-xl font-bold mt-4 shadow-lg shadow-brand-200/10">
-                    ส่งยอด
-                  </button>
-                </form>
+                <h3 className="text-lg font-bold text-white mb-6">ส่งยอด</h3>
+                <QuickFinanceForm />
               </div>
             </div>
           </div>
