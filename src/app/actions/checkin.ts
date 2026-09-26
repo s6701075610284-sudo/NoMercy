@@ -45,8 +45,26 @@ export async function submitCheckIn(imageUrl: string) {
   return { success: true };
 }
 
-export async function getRecentCheckIns(limit = 10) {
+export async function getRecentCheckIns(limit = 10, todayOnly = false) {
+  let whereClause = {};
+  
+  if (todayOnly) {
+    // Reset check-ins every day at 12:00 PM (Noon) BKK time
+    const bkkTime = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
+    bkkTime.setHours(12, 0, 0, 0); // Noon today
+    
+    // If it's before noon, we consider "today" as starting from yesterday noon
+    if (new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok", hour12: false }).split(', ')[1] < "12:00:00") {
+      bkkTime.setDate(bkkTime.getDate() - 1);
+    }
+    
+    // Adjust back to UTC for Prisma query (subtract 7 hours)
+    const utcStart = new Date(bkkTime.getTime() - (7 * 60 * 60 * 1000));
+    whereClause = { createdAt: { gte: utcStart } };
+  }
+
   const checkIns = await prisma.checkIn.findMany({
+    where: whereClause,
     orderBy: { createdAt: 'desc' },
     take: limit,
     include: {
@@ -60,17 +78,26 @@ export async function getRecentCheckIns(limit = 10) {
 }
 
 export async function getAbsentMembers() {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
+  // Reset absentees every day at 12:00 PM (Noon) BKK time
+  const bkkTime = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
+  bkkTime.setHours(12, 0, 0, 0); // Noon today
+  
+  // If it's currently before noon, we use yesterday's noon as the start
+  if (new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok", hour12: false }).split(', ')[1] < "12:00:00") {
+    bkkTime.setDate(bkkTime.getDate() - 1);
+  }
+  
+  // Adjust back to UTC for Prisma query
+  const utcStart = new Date(bkkTime.getTime() - (7 * 60 * 60 * 1000));
   
   // Find all users
   const allUsers = await prisma.user.findMany({
     select: { id: true, name: true, image: true, role: true, steamId: true }
   });
 
-  // Find all checkins in the last 24 hours
+  // Find all checkins since noon today
   const recentCheckIns = await prisma.checkIn.findMany({
-    where: { createdAt: { gte: yesterday } },
+    where: { createdAt: { gte: utcStart } },
     select: { userId: true }
   });
 

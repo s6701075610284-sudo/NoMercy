@@ -12,7 +12,7 @@ export function RecentCheckIns() {
   useEffect(() => {
     async function load() {
       const [checkinData, absentData] = await Promise.all([
-        getRecentCheckIns(5),
+        getRecentCheckIns(5, true),
         getAbsentMembers()
       ]);
       setCheckIns(checkinData);

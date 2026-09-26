@@ -27,14 +27,22 @@ export async function getDashboardStats() {
     if (e.type === "GREEN") totalGreen -= e.amount;
     if (e.type === "RED") totalRed -= e.amount;
   });
-  // Calculate check-ins in the last 24 hours
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
+  // Calculate check-ins for today (resets at noon BKK time)
+  const bkkTime = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
+  bkkTime.setHours(12, 0, 0, 0); // Noon today
+  
+  // If it's currently before noon, we use yesterday's noon as the start
+  if (new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok", hour12: false }).split(', ')[1] < "12:00:00") {
+    bkkTime.setDate(bkkTime.getDate() - 1);
+  }
+  
+  // Adjust back to UTC for Prisma query
+  const utcStart = new Date(bkkTime.getTime() - (7 * 60 * 60 * 1000));
   
   const recentCheckIns = await prisma.checkIn.count({
     where: {
       createdAt: {
-        gte: yesterday
+        gte: utcStart
       }
     }
   });

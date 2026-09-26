@@ -35,7 +35,7 @@ export function DashboardStats() {
         </div>
         <div className="mt-4 flex items-center text-xs text-green-400">
           <ArrowUp className="w-3 h-3 mr-1" />
-          <span>เช็คชื่อ 24 ชม. ที่ผ่านมา: {stats.recentCheckIns} คน</span>
+          <span>เช็คชื่อวันนี้: {stats.recentCheckIns} คน</span>
         </div>
       </div>
 
